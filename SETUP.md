@@ -5,28 +5,74 @@ variables, or API credentials.
 
 ## Cloudflare Pages
 
-### Recommended: connect the Git repository
+### Set up from the command line
 
-1. Push this repository to GitHub or GitLab.
-2. In the [Cloudflare dashboard](https://dash.cloudflare.com/), open
-   **Workers & Pages**.
-3. Select **Create application** > **Pages** > **Connect to Git**.
-4. Authorize the Git provider and select this repository.
-5. Configure the deployment:
+The setup script connects this Git repository to Cloudflare Pages and can attach
+a custom domain. Cloudflare deploys the site immediately and automatically
+deploys future pushes. No GitHub Action is needed.
 
-   | Setting | Value |
-   | --- | --- |
-   | Production branch | `main`, or the repository's default branch |
-   | Framework preset | None |
-   | Build command | Leave blank |
-   | Build output directory | `public` |
-   | Root directory | Leave blank |
+1. In **Workers & Pages**, select **Create application** > **Pages** >
+   **Connect to Git**. Install and authorize Cloudflare Pages for this GitHub or
+   GitLab repository, then leave the project creation flow. This one-time
+   provider authorization cannot be performed with a Cloudflare API token.
+2. Open the [Cloudflare API token page](https://dash.cloudflare.com/?to=/:account/api-tokens/create).
+3. Choose the **Edit Cloudflare Workers** permission template and add
+   **Account > Cloudflare Pages > Edit** permission.
+4. Include the account that will own the Pages project.
+5. Note the **Account ID** and **API Token** shown by Cloudflare.
+6. Run the script in an interactive terminal, passing the non-secret account ID.
 
-6. Select **Save and Deploy**.
+The script securely prompts for the token.
 
-Cloudflare will publish the site at a URL such as
-`https://<project>.pages.dev`. Future pushes to the production branch deploy
-automatically; other branches receive preview deployments.
+```sh
+./scripts/setup-cloudflare-pages.py \
+  --account-id '<account-id>' \
+  --custom-domain textarea.maruel.ca
+```
+
+The script reads the repository from the `origin` remote and supports GitHub and
+GitLab. Use `--git-remote upstream` if the repository to deploy is on another
+remote. The project name defaults to that remote repository's name, `textarea`
+here. It identifies the project in Cloudflare and normally produces
+`textarea.pages.dev`; Cloudflare may add random characters if that subdomain is
+already taken. Use `--project-name textarea-my` to select another name or reuse
+an existing Git-integrated project.
+
+Cloudflare also requires a production branch when creating the project. A
+deployment carrying that branch name updates the production site; deployments
+from other branches become previews. The script first checks the selected
+remote's default branch, then whether it has only one remote-tracking branch,
+and finally whether there is only one remote-tracking branch across all remotes.
+For this repository it infers `main`. If the result is ambiguous, pass an
+explicit value:
+
+```sh
+./scripts/setup-cloudflare-pages.py \
+  --account-id '<account-id>' \
+  --production-branch main
+```
+
+The script configures no build command and publishes `public`. The custom domain
+is optional; omit `--custom-domain` to use only the generated `pages.dev`
+address.
+
+An apex domain must be a zone in the same Cloudflare account. If a subdomain
+uses an external DNS provider, add a CNAME from that hostname to
+`<project-name>.pages.dev` after attaching it to the Pages project. Domain
+validation can remain pending until DNS is correct and the site has its first
+deployment.
+
+### Automatic deployments
+
+Push `main` to deploy the production site:
+
+```sh
+git push origin main
+```
+
+Other pushed branches receive preview deployments. An existing Direct Upload
+project cannot be converted to Git integration; if the selected name belongs to
+one, the script asks you to choose a different project name.
 
 ### Add a custom domain
 
@@ -41,21 +87,6 @@ nameservers. For a subdomain managed by another DNS provider, create the CNAME
 record Cloudflare requests. Add the domain through the Pages project before
 creating a CNAME manually, or Cloudflare may not associate the hostname with
 the deployment.
-
-### Optional: deploy directly from a computer
-
-Use a separate Direct Upload Pages project when Git-based deployments are not
-wanted. With Node.js and npm installed, run from the repository root:
-
-```sh
-npx wrangler login
-npx wrangler pages project create
-npx wrangler pages deploy public
-```
-
-Wrangler prompts for the project name and production branch. Direct Upload
-projects cannot later be converted to Git-integrated projects; create a new
-Pages project if that deployment model changes.
 
 ### Verify the deployment
 
@@ -108,6 +139,8 @@ redirects HTTP to HTTPS automatically when DNS and network access are correct.
 ## References
 
 - [Cloudflare Pages Git integration](https://developers.cloudflare.com/pages/get-started/git-integration/)
+- [Cloudflare Pages project API](https://developers.cloudflare.com/api/resources/pages/subresources/projects/methods/create/)
+- [Cloudflare Pages custom domain API](https://developers.cloudflare.com/api/resources/pages/subresources/projects/subresources/domains/methods/create/)
 - [Deploy static HTML](https://developers.cloudflare.com/pages/framework-guides/deploy-anything/)
 - [Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/)
 - [Pages custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/)
