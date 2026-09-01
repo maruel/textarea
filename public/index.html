@@ -192,6 +192,7 @@
   #menu .item {
     display: flex;
     align-items: center;
+    background: transparent;
     gap: 10px;
     cursor: pointer;
     text-decoration: none;
@@ -205,6 +206,7 @@
     touch-action: manipulation;
     font: 16px / 1.5 system-ui;
     color: var(--text);
+    width: 100%;
   }
 
   #menu .item:hover {
@@ -279,6 +281,12 @@
     </svg>
     New
   </a>
+  <button class="item" id="dictate" type="button" role="menuitem">
+    <svg aria-hidden="true" focusable="false" width="22" height="22">
+      <use xlink:href="#icon-microphone"></use>
+    </svg>
+    <span>Dictate</span>
+  </button>
   <a class="item" id="share-link" href="" role="menuitem">
     <svg aria-hidden="true" focusable="false" width="22" height="22">
       <use xlink:href="#icon-share"></use>
@@ -300,10 +308,9 @@
 </div>
 <div id="notification" class="noprint"></div>
 <script>
-  initUI()
-
   const article = document.querySelector('article')
   const editor = new Editor(article, parseMarkdown)
+  initUI()
   article.addEventListener('input', debounce(500, save))
   article.addEventListener('blur', save)
   article.addEventListener('click', event => {
@@ -530,8 +537,47 @@
   function initUI() {
     const menu = document.querySelector('#menu')
     const button = document.querySelector('#button')
+    const dictate = document.querySelector('#dictate')
     const shareLink = document.querySelector('#share-link')
     const saveAsText = document.querySelector('#save-as-text')
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition()
+      const dictateLabel = dictate.querySelector('span')
+      let listening = false
+
+      dictate.addEventListener('pointerdown', () => editor.rememberSelection())
+      dictate.addEventListener('click', () => {
+        editor.rememberSelection()
+        if (listening) {
+          recognition.stop()
+        } else {
+          recognition.start()
+        }
+        hideMenu()
+      })
+      recognition.addEventListener('start', () => {
+        listening = true
+        dictateLabel.textContent = 'Stop dictating'
+        dictate.setAttribute('aria-pressed', 'true')
+      })
+      recognition.addEventListener('result', event => {
+        let transcript = ''
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+        }
+        if (transcript) editor.insert(transcript)
+      })
+      recognition.addEventListener('error', () => notify('Speech recognition failed'))
+      recognition.addEventListener('end', () => {
+        listening = false
+        dictateLabel.textContent = 'Dictate'
+        dictate.setAttribute('aria-pressed', 'false')
+      })
+    } else {
+      dictate.remove()
+    }
 
     button.addEventListener('click', event => {
       if (event.clientX || event.targetTouches) ripple(event)
@@ -592,6 +638,7 @@
   function Editor(element, highlight) {
     const listeners = []
     const history = []
+    let rememberedSelection
     let at = -1, prev
 
     const debounceHighlight = debounce(30, () => {
@@ -861,6 +908,34 @@
         element.textContent = content
         highlight(element)
       },
+      rememberSelection() {
+        const selection = getSelection()
+        if (element.contains(selection.anchorNode) && element.contains(selection.focusNode)) {
+          rememberedSelection = save()
+        }
+      },
+      insert(content) {
+        const pos = rememberedSelection || {
+          start: element.textContent.length,
+          end: element.textContent.length,
+          dir: '->',
+        }
+        const start = Math.min(pos.start, pos.end)
+        const end = Math.max(pos.start, pos.end)
+        const text = element.textContent
+
+        element.focus()
+        restore(pos)
+        recordHistory()
+        element.textContent = text.slice(0, start) + content + text.slice(end)
+        highlight(element)
+
+        const caret = start + content.length
+        rememberedSelection = {start: caret, end: caret, dir: '->'}
+        restore(rememberedSelection)
+        recordHistory()
+        element.dispatchEvent(new Event('input', {bubbles: true}))
+      },
       destroy() {
         for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
       },
@@ -874,6 +949,13 @@
     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
     <path d="M12 5l0 14"/>
     <path d="M5 12l14 0"/>
+  </symbol>
+  <symbol id="icon-microphone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a3 3 0 0 0 -3 3v7a3 3 0 0 0 6 0v-7a3 3 0 0 0 -3 -3"/>
+    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+    <path d="M8 21h8"/>
+    <path d="M12 19v2"/>
   </symbol>
   <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
           stroke-linecap="round"

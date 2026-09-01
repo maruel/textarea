@@ -1,0 +1,5 @@
+textarea.maruel.ca {
+	root ./public
+	encode
+	file_server
+}
