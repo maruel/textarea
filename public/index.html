@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -125,7 +125,7 @@
 		background-color: #0569fa;
 		border-radius: 50%;
 		border: none;
-		bottom: 15px;
+		bottom: calc(15px + var(--keyboard-offset, 0px));
 		box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, .12);
 		color: #fff;
 		cursor: pointer;
@@ -652,6 +652,17 @@
 			button.remove()
 			help.querySelectorAll('.dictation').forEach(el => el.remove())
 			return
+		}
+
+		const viewport = window.visualViewport
+		if (viewport) {
+			const moveButton = () => {
+				const offset = Math.max(0, innerHeight - viewport.height - viewport.offsetTop)
+				button.style.setProperty('--keyboard-offset', `${offset}px`)
+			}
+			viewport.addEventListener('resize', moveButton)
+			viewport.addEventListener('scroll', moveButton)
+			moveButton()
 		}
 
 		const recognition = new SpeechRecognition()
