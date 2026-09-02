@@ -214,6 +214,16 @@
     font-family: monospace;
   }
 
+  #help select {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    margin-left: 8px;
+    padding: 2px 4px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    border-radius: 6px;
+  }
+
   #help kbd {
     border: 1px solid rgba(128, 128, 128, 0.5);
     border-radius: 4px;
@@ -282,6 +292,25 @@
     <li><kbd class="mod">Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
     <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> – save as text</li>
   </ul>
+  <h2 class="dictation">Dictation</h2>
+  <p class="dictation">
+    <label for="lang">Language</label>
+    <select id="lang">
+      <option value="en-US">English (US)</option>
+      <option value="en-CA">English (Canada)</option>
+      <option value="en-GB">English (UK)</option>
+      <option value="fr-CA">Français (Canada)</option>
+      <option value="fr-FR">Français (France)</option>
+      <option value="es-ES">Español</option>
+      <option value="de-DE">Deutsch</option>
+      <option value="it-IT">Italiano</option>
+      <option value="pt-BR">Português (Brasil)</option>
+      <option value="nl-NL">Nederlands</option>
+      <option value="ja-JP">日本語</option>
+      <option value="ko-KR">한국어</option>
+      <option value="zh-CN">中文</option>
+    </select>
+  </p>
   <h2>Pro tips</h2>
   <ul>
     <li>Start the document with <code># Title</code> to set the page title</li>
@@ -373,6 +402,22 @@
     writer.close()
     const buffer = await new Response(stream.readable).arrayBuffer()
     return new TextDecoder().decode(buffer)
+  }
+
+  // localStorage throws when the browser blocks storage, e.g. in a sandboxed frame.
+  function read(key) {
+    try {
+      return localStorage.getItem(key)
+    } catch {
+      return null
+    }
+  }
+
+  function write(key, value) {
+    try {
+      localStorage.setItem(key, value)
+    } catch {
+    }
   }
 
   function debounce(ms, fn) {
@@ -517,7 +562,10 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
     // A click anywhere, on the dialog or on its backdrop, dismisses the help.
-    help.addEventListener('click', () => help.close())
+    // Except on the language picker, which needs the clicks.
+    help.addEventListener('click', event => {
+      if (!event.target.closest('select, label')) help.close()
+    })
 
     const platform = navigator.userAgentData?.platform || navigator.platform || ''
     if (/mac|iphone|ipad|ipod/i.test(platform)) {
@@ -531,7 +579,28 @@
     }
 
     const recognition = new SpeechRecognition()
+    const langSelect = document.querySelector('#lang')
     let listening = false
+    let restart = false
+
+    // The UI locale is a poor guess: a French Canadian browser is often used to
+    // dictate in English. `?lang=` wins, then the last pick, then the browser.
+    recognition.lang = new URLSearchParams(location.search).get('lang')
+      || read('lang')
+      || navigator.language
+    if (!langSelect.querySelector(`option[value="${CSS.escape(recognition.lang)}"]`)) {
+      langSelect.append(new Option(recognition.lang, recognition.lang))
+    }
+    langSelect.value = recognition.lang
+    langSelect.addEventListener('change', () => {
+      recognition.lang = langSelect.value
+      write('lang', langSelect.value)
+      // A running recognition keeps the language it started with.
+      if (listening) {
+        restart = true
+        recognition.stop()
+      }
+    })
 
     function toggleDictation() {
       editor.rememberSelection()
@@ -572,6 +641,10 @@
       button.setAttribute('aria-pressed', 'false')
       button.setAttribute('aria-label', 'Dictate')
       button.title = 'Dictate'
+      if (restart) {
+        restart = false
+        recognition.start()
+      }
     })
 
     function notify(message) {
