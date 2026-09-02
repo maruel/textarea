@@ -175,6 +175,45 @@
     }
   }
 
+  #help {
+    max-width: min(440px, calc(100vw - 32px));
+    padding: 20px 24px;
+    border: none;
+    border-radius: 12px;
+    background: var(--elevated);
+    color: var(--text);
+    font: 16px / 1.5 system-ui;
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.10), 0 15px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  #help::backdrop {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  #help h1 {
+    font-size: 1.25em;
+  }
+
+  #help h2 {
+    font-size: 1em;
+    margin-top: 14px;
+  }
+
+  #help ul {
+    padding-left: 20px;
+  }
+
+  #help code,
+  #help kbd {
+    font-family: monospace;
+  }
+
+  #help kbd {
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    border-radius: 4px;
+    padding: 0 4px;
+  }
+
   #notification {
     visibility: hidden;
     transform: translateY(-30px);
@@ -220,6 +259,32 @@
     <path d="M12 19v2"/>
   </svg>
 </button>
+<dialog id="help" class="noprint">
+  <h1>Textarea</h1>
+  <p>A minimalist text editor that lives entirely in your browser and stores everything in the URL hash.</p>
+  <h2>Features</h2>
+  <ul>
+    <li>🗜️ <b>Compression</b> – your text is compressed with deflate</li>
+    <li>🔗 <b>URL hash</b> – share your notes by copying the URL</li>
+    <li>💕 <b>Style</b> – customize the look with CSS via DevTools</li>
+    <li class="dictation">🎤 <b>Dictation</b> – speech recognition types at the caret</li>
+  </ul>
+  <h2>Keys</h2>
+  <ul>
+    <li><kbd>F1</kbd> – this help</li>
+    <li class="dictation"><kbd>F2</kbd> – start and stop dictation</li>
+    <li><kbd>Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
+  </ul>
+  <h2>Pro tips</h2>
+  <ul>
+    <li>Start the document with <code># Title</code> to set the page title</li>
+    <li>Add a <code>style</code> attribute to the <code>&lt;article&gt;</code> tag via DevTools. It is saved in the
+      URL too
+    </li>
+  </ul>
+  <p><a href="https://github.com/maruel/textarea" target="_blank" rel="noopener noreferrer">github.com/maruel/textarea</a>
+  </p>
+</dialog>
 <div id="notification" class="noprint"></div>
 <script>
   const article = document.querySelector('article')
@@ -237,6 +302,10 @@
     if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
       e.preventDefault()
       downloadHTML()
+    }
+    if (e.code === 'F1') {
+      e.preventDefault()
+      toggleHelp()
     }
   })
   if ('serviceWorker' in navigator) {
@@ -417,27 +486,47 @@
     article.normalize()
   }
 
+  function toggleHelp() {
+    const help = document.querySelector('#help')
+    if (help.open) help.close(); else help.showModal()
+  }
+
   function initUI() {
     const button = document.querySelector('#button')
+    const help = document.querySelector('#help')
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+    // A click anywhere, on the dialog or on its backdrop, dismisses the help.
+    help.addEventListener('click', () => help.close())
 
     if (!SpeechRecognition) {
       button.remove()
+      help.querySelectorAll('.dictation').forEach(el => el.remove())
       return
     }
 
     const recognition = new SpeechRecognition()
     let listening = false
 
-    button.addEventListener('pointerdown', () => editor.rememberSelection())
-    button.addEventListener('click', event => {
-      if (event.clientX || event.targetTouches) ripple(event)
+    function toggleDictation() {
       editor.rememberSelection()
       if (listening) {
         recognition.stop()
       } else {
         recognition.start()
       }
+    }
+
+    addEventListener('keydown', event => {
+      if (event.code === 'F2') {
+        event.preventDefault()
+        toggleDictation()
+      }
+    })
+    button.addEventListener('pointerdown', () => editor.rememberSelection())
+    button.addEventListener('click', event => {
+      if (event.clientX || event.targetTouches) ripple(event)
+      toggleDictation()
     })
     recognition.addEventListener('start', () => {
       listening = true
