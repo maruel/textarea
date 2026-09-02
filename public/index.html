@@ -137,6 +137,37 @@
 		z-index: 1;
 	}
 
+	#help-button {
+		-webkit-tap-highlight-color: transparent;
+		background: var(--elevated);
+		border: none;
+		border-radius: 50%;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+		color: var(--text);
+		cursor: pointer;
+		display: none;
+		font: 600 20px / 1 system-ui;
+		height: 44px;
+		place-items: center;
+		position: fixed;
+		right: max(15px, env(safe-area-inset-right));
+		top: max(15px, env(safe-area-inset-top));
+		touch-action: manipulation;
+		width: 44px;
+		z-index: 1;
+	}
+
+	#help-button:focus-visible {
+		outline: 2px solid var(--outline);
+		outline-offset: 2px;
+	}
+
+	@media (max-width: 600px) {
+		#help-button {
+			display: grid;
+		}
+	}
+
 	@media (hover) {
 		#button:hover {
 			color: #fff;
@@ -272,6 +303,7 @@
 	}
 </style>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
+<button id="help-button" class="noprint" type="button" aria-label="Help" title="Help">?</button>
 <button id="button" class="noprint" type="button" aria-pressed="false" aria-label="Dictate" title="Dictate">
 	<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -553,7 +585,15 @@
 	function initUI() {
 		const button = document.querySelector('#button')
 		const help = document.querySelector('#help')
+		const helpButton = document.querySelector('#help-button')
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+		const mobile = matchMedia('(max-width: 600px)')
+
+		helpButton.addEventListener('click', toggleHelp)
+		if (mobile.matches && read('mobile-help-shown') !== 'true') {
+			write('mobile-help-shown', 'true')
+			toggleHelp()
+		}
 
 		// A click anywhere, on the dialog or on its backdrop, dismisses the help.
 		// Except on the language buttons, which need the clicks.
