@@ -289,6 +289,8 @@
   <ul>
     <li><kbd>F1</kbd> – this help</li>
     <li class="dictation"><kbd>F2</kbd> – start and stop dictation</li>
+    <li class="dictation"><kbd>F3</kbd> – dictate in English (US)</li>
+    <li class="dictation"><kbd>F4</kbd> – dictate in <span id="lang-browser">your browser language</span></li>
     <li><kbd class="mod">Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
     <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> – save as text</li>
   </ul>
@@ -585,22 +587,27 @@
 
     // The UI locale is a poor guess: a French Canadian browser is often used to
     // dictate in English. `?lang=` wins, then the last pick, then the browser.
-    recognition.lang = new URLSearchParams(location.search).get('lang')
+    setLang(new URLSearchParams(location.search).get('lang')
       || read('lang')
-      || navigator.language
-    if (!langSelect.querySelector(`option[value="${CSS.escape(recognition.lang)}"]`)) {
-      langSelect.append(new Option(recognition.lang, recognition.lang))
-    }
-    langSelect.value = recognition.lang
-    langSelect.addEventListener('change', () => {
-      recognition.lang = langSelect.value
-      write('lang', langSelect.value)
+      || navigator.language, false)
+    help.querySelector('#lang-browser').textContent = navigator.language
+    langSelect.addEventListener('change', () => setLang(langSelect.value))
+
+    // Only an explicit pick is remembered, else a detected locale would outlive
+    // a change of browser language.
+    function setLang(lang, remember = true) {
+      if (!langSelect.querySelector(`option[value="${CSS.escape(lang)}"]`)) {
+        langSelect.append(new Option(lang, lang))
+      }
+      langSelect.value = lang
+      recognition.lang = lang
+      if (remember) write('lang', lang)
       // A running recognition keeps the language it started with.
       if (listening) {
         restart = true
         recognition.stop()
       }
-    })
+    }
 
     function toggleDictation() {
       editor.rememberSelection()
@@ -615,6 +622,11 @@
       if (event.code === 'F2') {
         event.preventDefault()
         toggleDictation()
+      }
+      if (event.code === 'F3' || event.code === 'F4') {
+        event.preventDefault()
+        setLang(event.code === 'F3' ? 'en-US' : navigator.language)
+        notify('Dictation: ' + langSelect.selectedOptions[0].textContent)
       }
     })
     button.addEventListener('pointerdown', () => editor.rememberSelection())
