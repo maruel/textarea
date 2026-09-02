@@ -20,6 +20,7 @@
 
 		background-color: #fff;
 		--elevated: #fff;
+		--interim: #5f6973;
 		--link: #0066cc;
 		--text: #161616;
 		--outline: #007aff;
@@ -27,6 +28,7 @@
 		@media (prefers-color-scheme: dark) {
 			background-color: #000;
 			--elevated: #121212;
+			--interim: #a6b0ba;
 			--link: #58a6ff;
 			--text: #fff;
 		}
@@ -53,6 +55,12 @@
 		white-space: pre-wrap;
 		text-wrap-style: stable;
 		overflow-wrap: break-word;
+	}
+
+	::highlight(dictation-interim) {
+		color: var(--interim);
+		text-decoration: underline dotted;
+		text-underline-offset: 3px;
 	}
 
 	.md-h1,
@@ -707,6 +715,7 @@
 			button.title = 'Stop dictating'
 		})
 		recognition.addEventListener('result', event => {
+			let finalLength = 0
 			let transcript = ''
 			let stop = false
 			for (let i = 0; i < event.results.length; i++) {
@@ -716,8 +725,9 @@
 					break
 				}
 				transcript += result
+				if (event.results[i].isFinal) finalLength = transcript.length
 			}
-			editor.updateDictation(transcript)
+			editor.updateDictation(transcript, finalLength)
 			if (stop) recognition.stop()
 		})
 		recognition.addEventListener('error', () => notify('Speech recognition failed'))
@@ -756,11 +766,15 @@
 	}
 
 	function Editor(element, highlight) {
+		const dictationHighlight = typeof Highlight === 'function' && globalThis.CSS?.highlights
+			? new Highlight()
+			: undefined
 		const listeners = []
 		const history = []
 		let dictation
 		let rememberedSelection
 		let at = -1, prev
+		if (dictationHighlight) CSS.highlights.set('dictation-interim', dictationHighlight)
 
 		const debounceHighlight = debounce(30, () => {
 			const pos = save()
@@ -988,6 +1002,33 @@
 			}
 		}
 
+		function pointAt(offset) {
+			let current = 0
+			let point = {node: element, offset: element.childNodes.length}
+			visit(element, node => {
+				if (node.nodeType !== Node.TEXT_NODE) return
+				const length = node.nodeValue.length
+				if (offset <= current + length) {
+					point = {node, offset: offset - current}
+					return 'stop'
+				}
+				current += length
+			})
+			return point
+		}
+
+		function showDictationInterim(start, end) {
+			if (!dictationHighlight) return
+			dictationHighlight.clear()
+			if (start === end) return
+			const range = element.ownerDocument.createRange()
+			const from = pointAt(start)
+			const to = pointAt(end)
+			range.setStart(from.node, from.offset)
+			range.setEnd(to.node, to.offset)
+			dictationHighlight.add(range)
+		}
+
 		function visit(editor, visitor) {
 			const queue = []
 			if (editor.firstChild) queue.push(editor.firstChild)
@@ -1047,9 +1088,10 @@
 				element.focus()
 				restore(pos)
 				recordHistory()
+				dictationHighlight?.clear()
 				dictation = {start, end}
 			},
-			updateDictation(content) {
+			updateDictation(content, finalLength) {
 				if (!dictation) return
 				const {start, end} = dictation
 				const text = element.textContent
@@ -1060,14 +1102,17 @@
 				const caret = start + content.length
 				rememberedSelection = {start: caret, end: caret, dir: '->'}
 				restore(rememberedSelection)
+				showDictationInterim(start + finalLength, caret)
 				element.dispatchEvent(new Event('input', {bubbles: true}))
 			},
 			endDictation() {
 				if (!dictation) return
 				recordHistory()
+				dictationHighlight?.clear()
 				dictation = undefined
 			},
 			destroy() {
+				if (dictationHighlight) CSS.highlights.delete('dictation-interim')
 				for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
 			},
 		}
