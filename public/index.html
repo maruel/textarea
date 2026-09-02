@@ -176,7 +176,13 @@
   }
 
   #help {
-    max-width: min(440px, calc(100vw - 32px));
+    /* The `*` reset above zeroes the margin the UA uses to center a modal dialog. */
+    margin: auto;
+    outline: none;
+    width: min(440px, 100vw - 32px);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 20px 24px;
     border: none;
     border-radius: 12px;
@@ -259,7 +265,7 @@
     <path d="M12 19v2"/>
   </svg>
 </button>
-<dialog id="help" class="noprint">
+<dialog id="help" class="noprint" tabindex="-1">
   <h1>Textarea</h1>
   <p>A minimalist text editor that lives entirely in your browser and stores everything in the URL hash.</p>
   <h2>Features</h2>
@@ -273,7 +279,8 @@
   <ul>
     <li><kbd>F1</kbd> – this help</li>
     <li class="dictation"><kbd>F2</kbd> – start and stop dictation</li>
-    <li><kbd>Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
+    <li><kbd class="mod">Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
+    <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> – save as text</li>
   </ul>
   <h2>Pro tips</h2>
   <ul>
@@ -301,7 +308,7 @@
   addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
       e.preventDefault()
-      downloadHTML()
+      if (e.shiftKey) downloadTXT(); else downloadHTML()
     }
     if (e.code === 'F1') {
       e.preventDefault()
@@ -382,19 +389,28 @@
     doc.querySelectorAll('script').forEach(s => s.remove())
     doc.querySelectorAll('.noprint').forEach(s => s.remove())
     doc.querySelector('article').removeAttribute('contenteditable')
-    const html = '<!DOCTYPE html>\n' + doc.outerHTML
+    await download('.html', 'text/html', '<!DOCTYPE html>\n' + doc.outerHTML)
+  }
+
+  async function downloadTXT() {
+    updateTitle()
+    await download('.txt', 'text/plain', article.textContent)
+  }
+
+  async function download(ext, type, content) {
+    const name = document.title + ext
 
     if ('showSaveFilePicker' in window) {
       try {
         const handle = await showSaveFilePicker({
-          suggestedName: document.title + '.html',
+          suggestedName: name,
           types: [{
-            description: 'HTML file',
-            accept: {'text/html': ['.html']},
+            description: ext.slice(1).toUpperCase() + ' file',
+            accept: {[type]: [ext]},
           }],
         })
         const writable = await handle.createWritable()
-        await writable.write(html)
+        await writable.write(content)
         await writable.close()
         return
       } catch (e) {
@@ -402,11 +418,10 @@
       }
     }
 
-    const blob = new Blob([html], {type: 'text/html'})
-    const url = URL.createObjectURL(blob)
+    const url = URL.createObjectURL(new Blob([content], {type}))
     const a = document.createElement('a')
     a.href = url
-    a.download = document.title + '.html'
+    a.download = name
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -488,7 +503,12 @@
 
   function toggleHelp() {
     const help = document.querySelector('#help')
-    if (help.open) help.close(); else help.showModal()
+    if (help.open) {
+      help.close()
+      return
+    }
+    help.showModal()
+    help.focus() // Else the dialog opens with the GitHub link focused and ringed.
   }
 
   function initUI() {
@@ -498,6 +518,11 @@
 
     // A click anywhere, on the dialog or on its backdrop, dismisses the help.
     help.addEventListener('click', () => help.close())
+
+    const platform = navigator.userAgentData?.platform || navigator.platform || ''
+    if (/mac|iphone|ipad|ipod/i.test(platform)) {
+      help.querySelectorAll('.mod').forEach(el => el.textContent = '⌘')
+    }
 
     if (!SpeechRecognition) {
       button.remove()
