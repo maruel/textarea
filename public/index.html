@@ -150,6 +150,16 @@
     outline-offset: 2px;
   }
 
+  #button[aria-pressed="true"] {
+    background-color: #e8352b;
+  }
+
+  @media (hover) {
+    #button[aria-pressed="true"]:hover {
+      background-color: #f05a51;
+    }
+  }
+
   span.ripple {
     position: absolute;
     border-radius: 50%;
@@ -163,71 +173,6 @@
       transform: scale(4);
       opacity: 0;
     }
-  }
-
-  #menu {
-    visibility: hidden;
-    transform: scale(0.9) translateY(20px);
-    transition: all 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    opacity: 0;
-    display: flex;
-    flex-direction: column;
-    width: 180px;
-    position: fixed;
-    right: 16px;
-    bottom: 77px;
-    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.10), 0 15px 12px rgba(0, 0, 0, 0.05);
-    background: var(--elevated);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    z-index: 2;
-  }
-
-  #menu.visible {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    visibility: visible;
-  }
-
-  #menu .item {
-    display: flex;
-    align-items: center;
-    background: transparent;
-    gap: 10px;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: left;
-    padding: 10px 14px;
-    overflow: hidden;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-    border: none;
-    touch-action: manipulation;
-    font: 16px / 1.5 system-ui;
-    color: var(--text);
-    width: 100%;
-  }
-
-  #menu .item:hover {
-    background-color: rgba(0, 0, 0, 0.04);
-    @media (prefers-color-scheme: dark) {
-      background-color: #353535;
-    }
-  }
-
-  #menu .item:focus-within {
-    outline: 2px solid var(--outline);
-  }
-
-  #menu .item:first-child {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-  }
-
-  #menu .item:last-child {
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
   }
 
   #notification {
@@ -265,47 +210,16 @@
   }
 </style>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
-<button id="button" class="noprint">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+<button id="button" class="noprint" type="button" aria-pressed="false" aria-label="Dictate" title="Dictate">
+  <svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none"
        stroke="currentColor"
-       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="1"></circle>
-    <circle cx="12" cy="5" r="1"></circle>
-    <circle cx="12" cy="19" r="1"></circle>
+       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a3 3 0 0 0 -3 3v7a3 3 0 0 0 6 0v-7a3 3 0 0 0 -3 -3"/>
+    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+    <path d="M8 21h8"/>
+    <path d="M12 19v2"/>
   </svg>
 </button>
-<div id="menu" class="noprint" role="menu">
-  <a class="item" href="#new" target="_blank" role="menuitem">
-    <svg aria-hidden="true" focusable="false" width="22" height="22">
-      <use xlink:href="#icon-plus"></use>
-    </svg>
-    New
-  </a>
-  <button class="item" id="dictate" type="button" role="menuitem">
-    <svg aria-hidden="true" focusable="false" width="22" height="22">
-      <use xlink:href="#icon-microphone"></use>
-    </svg>
-    <span>Dictate</span>
-  </button>
-  <a class="item" id="share-link" href="" role="menuitem">
-    <svg aria-hidden="true" focusable="false" width="22" height="22">
-      <use xlink:href="#icon-share"></use>
-    </svg>
-    Share link
-  </a>
-  <a class="item" id="save-as-text" href="" role="menuitem">
-    <svg aria-hidden="true" focusable="false" width="22" height="22">
-      <use xlink:href="#icon-save"></use>
-    </svg>
-    Save as txt
-  </a>
-  <a class="item" href="https://github.com/antonmedv/textarea" target="_blank" role="menuitem">
-    <svg aria-hidden="true" focusable="false" width="22" height="22">
-      <use xlink:href="#icon-github"></use>
-    </svg>
-    GitHub
-  </a>
-</div>
 <div id="notification" class="noprint"></div>
 <script>
   const article = document.querySelector('article')
@@ -428,37 +342,6 @@
     URL.revokeObjectURL(url)
   }
 
-  async function downloadTXT() {
-    updateTitle()
-    const text = article.textContent
-
-    if ('showSaveFilePicker' in window) {
-      try {
-        const handle = await showSaveFilePicker({
-          suggestedName: document.title + '.txt',
-          types: [{
-            description: 'TEXT file',
-            accept: {'text/plain': ['.txt']},
-          }],
-        })
-        const writable = await handle.createWritable()
-        await writable.write(text)
-        await writable.close()
-        return
-      } catch (e) {
-        if (e.name === 'AbortError') return
-      }
-    }
-
-    const blob = new Blob([text], {type: 'text/plain'})
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = document.title + '.txt'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
   function parseMarkdown(element) {
     const input = element.textContent
     const frag = document.createDocumentFragment()
@@ -535,59 +418,47 @@
   }
 
   function initUI() {
-    const menu = document.querySelector('#menu')
     const button = document.querySelector('#button')
-    const dictate = document.querySelector('#dictate')
-    const shareLink = document.querySelector('#share-link')
-    const saveAsText = document.querySelector('#save-as-text')
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition()
-      const dictateLabel = dictate.querySelector('span')
-      let listening = false
-
-      dictate.addEventListener('pointerdown', () => editor.rememberSelection())
-      dictate.addEventListener('click', () => {
-        editor.rememberSelection()
-        if (listening) {
-          recognition.stop()
-        } else {
-          recognition.start()
-        }
-        hideMenu()
-      })
-      recognition.addEventListener('start', () => {
-        listening = true
-        dictateLabel.textContent = 'Stop dictating'
-        dictate.setAttribute('aria-pressed', 'true')
-      })
-      recognition.addEventListener('result', event => {
-        let transcript = ''
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) transcript += event.results[i][0].transcript
-        }
-        if (transcript) editor.insert(transcript)
-      })
-      recognition.addEventListener('error', () => notify('Speech recognition failed'))
-      recognition.addEventListener('end', () => {
-        listening = false
-        dictateLabel.textContent = 'Dictate'
-        dictate.setAttribute('aria-pressed', 'false')
-      })
-    } else {
-      dictate.remove()
+    if (!SpeechRecognition) {
+      button.remove()
+      return
     }
 
+    const recognition = new SpeechRecognition()
+    let listening = false
+
+    button.addEventListener('pointerdown', () => editor.rememberSelection())
     button.addEventListener('click', event => {
       if (event.clientX || event.targetTouches) ripple(event)
-      menu.classList.toggle('visible')
-      shareLink.setAttribute('href', location.href)
+      editor.rememberSelection()
+      if (listening) {
+        recognition.stop()
+      } else {
+        recognition.start()
+      }
     })
-
-    function hideMenu() {
-      menu.classList.remove('visible')
-    }
+    recognition.addEventListener('start', () => {
+      listening = true
+      button.setAttribute('aria-pressed', 'true')
+      button.setAttribute('aria-label', 'Stop dictating')
+      button.title = 'Stop dictating'
+    })
+    recognition.addEventListener('result', event => {
+      let transcript = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+      }
+      if (transcript) editor.insert(transcript)
+    })
+    recognition.addEventListener('error', () => notify('Speech recognition failed'))
+    recognition.addEventListener('end', () => {
+      listening = false
+      button.setAttribute('aria-pressed', 'false')
+      button.setAttribute('aria-label', 'Dictate')
+      button.title = 'Dictate'
+    })
 
     function notify(message) {
       const notification = document.querySelector('#notification')
@@ -595,30 +466,6 @@
       notification.textContent = message
       setTimeout(() => notification.classList.remove('visible'), 2e3)
     }
-
-    document.body.addEventListener('click', event => {
-      let t = event.target
-      if (t.closest('#menu')) return
-      if (t.closest('#button')) return
-      if (t.closest('.ripple')) return
-      menu.classList.remove('visible')
-    })
-
-    shareLink.addEventListener('click', event => {
-      event.preventDefault()
-      if (!navigator.clipboard) {
-        alert('Your browser does not support clipboard API')
-        return
-      }
-      navigator.clipboard.writeText(location.href)
-      notify('Link copied')
-      hideMenu()
-    })
-    saveAsText.addEventListener('click', event => {
-      event.preventDefault()
-      downloadTXT()
-      hideMenu()
-    })
   }
 
   function ripple(event) {
@@ -942,40 +789,3 @@
     }
   }
 </script>
-<svg style="display: none" aria-hidden="true" focusable="false">
-  <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"
-          class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-    <path d="M12 5l0 14"/>
-    <path d="M5 12l14 0"/>
-  </symbol>
-  <symbol id="icon-microphone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 2a3 3 0 0 0 -3 3v7a3 3 0 0 0 6 0v-7a3 3 0 0 0 -3 -3"/>
-    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
-    <path d="M8 21h8"/>
-    <path d="M12 19v2"/>
-  </symbol>
-  <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
-          stroke-linecap="round"
-          stroke-linejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-    <path d="M8 9h-1a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-1"/>
-    <path d="M12 14v-11"/>
-    <path d="M9 6l3 -3l3 3"/>
-  </symbol>
-  <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-    <path d="M6 4h10l4 4v12a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1v-15a1 1 0 0 1 1 -1"/>
-    <path d="M12 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>
-    <path d="M9 4l0 5l6 0l0 -5"/>
-  </symbol>
-  <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-    <path
-      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"/>
-  </symbol>
-</svg>
