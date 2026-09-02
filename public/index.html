@@ -350,6 +350,7 @@
 		<button class="lang" type="button" value="en-US">en-US</button>
 		<button class="lang" type="button" id="lang-browser"></button>
 	</p>
+	<p class="dictation">Say <q>stop</q> to stop dictating.</p>
 	<h2>Pro tips</h2>
 	<ul>
 		<li>Start the document with <code># Title</code> to set the page title</li>
@@ -646,6 +647,7 @@
 		}
 
 		const recognition = new SpeechRecognition()
+		recognition.interimResults = true
 		const otherButton = help.querySelector('#lang-browser')
 		let listening = false
 		let restart = false
@@ -699,20 +701,29 @@
 		})
 		recognition.addEventListener('start', () => {
 			listening = true
+			editor.startDictation()
 			button.setAttribute('aria-pressed', 'true')
 			button.setAttribute('aria-label', 'Stop dictating')
 			button.title = 'Stop dictating'
 		})
 		recognition.addEventListener('result', event => {
 			let transcript = ''
-			for (let i = event.resultIndex; i < event.results.length; i++) {
-				if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+			let stop = false
+			for (let i = 0; i < event.results.length; i++) {
+				const result = event.results[i][0].transcript
+				if (event.results[i].isFinal && /^\s*stop[.!?]*\s*$/i.test(result)) {
+					stop = true
+					break
+				}
+				transcript += result
 			}
-			if (transcript) editor.insert(transcript)
+			editor.updateDictation(transcript)
+			if (stop) recognition.stop()
 		})
 		recognition.addEventListener('error', () => notify('Speech recognition failed'))
 		recognition.addEventListener('end', () => {
 			listening = false
+			editor.endDictation()
 			button.setAttribute('aria-pressed', 'false')
 			button.setAttribute('aria-label', 'Dictate')
 			button.title = 'Dictate'
@@ -747,6 +758,7 @@
 	function Editor(element, highlight) {
 		const listeners = []
 		const history = []
+		let dictation
 		let rememberedSelection
 		let at = -1, prev
 
@@ -1023,7 +1035,7 @@
 					rememberedSelection = save()
 				}
 			},
-			insert(content) {
+			startDictation() {
 				const pos = rememberedSelection || {
 					start: element.textContent.length,
 					end: element.textContent.length,
@@ -1031,19 +1043,29 @@
 				}
 				const start = Math.min(pos.start, pos.end)
 				const end = Math.max(pos.start, pos.end)
-				const text = element.textContent
 
 				element.focus()
 				restore(pos)
 				recordHistory()
+				dictation = {start, end}
+			},
+			updateDictation(content) {
+				if (!dictation) return
+				const {start, end} = dictation
+				const text = element.textContent
 				element.textContent = text.slice(0, start) + content + text.slice(end)
+				dictation.end = start + content.length
 				highlight(element)
 
 				const caret = start + content.length
 				rememberedSelection = {start: caret, end: caret, dir: '->'}
 				restore(rememberedSelection)
-				recordHistory()
 				element.dispatchEvent(new Event('input', {bubbles: true}))
+			},
+			endDictation() {
+				if (!dictation) return
+				recordHistory()
+				dictation = undefined
 			},
 			destroy() {
 				for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
