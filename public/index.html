@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
 <title>Textarea</title>
 <style>
@@ -268,6 +269,18 @@
 		padding: 0 4px;
 	}
 
+	#install {
+		background: none;
+		border: none;
+		color: var(--link);
+		cursor: pointer;
+		font: inherit;
+		padding: 0;
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 4px;
+	}
+
 	#notification {
 		visibility: hidden;
 		transform: translateY(-30px);
@@ -316,6 +329,7 @@
 <dialog id="help" class="noprint" tabindex="-1">
 	<h1>Textarea</h1>
 	<p>A minimalist text editor that lives entirely in your browser and stores everything in the URL hash.</p>
+	<p><button id="install" type="button" hidden>Install Textarea</button></p>
 	<h2>Features</h2>
 	<ul>
 		<li>🗜️ <b>Compression</b> – your text is compressed with deflate</li>
@@ -586,10 +600,29 @@
 		const button = document.querySelector('#button')
 		const help = document.querySelector('#help')
 		const helpButton = document.querySelector('#help-button')
+		const installButton = document.querySelector('#install')
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 		const mobile = matchMedia('(max-width: 600px)')
+		let installPrompt
 
 		helpButton.addEventListener('click', toggleHelp)
+		addEventListener('beforeinstallprompt', event => {
+			event.preventDefault()
+			installPrompt = event
+			installButton.hidden = false
+		})
+		installButton.addEventListener('click', async () => {
+			const prompt = installPrompt
+			if (!prompt) return
+			installPrompt = undefined
+			installButton.hidden = true
+			help.close()
+			await prompt.prompt()
+		})
+		addEventListener('appinstalled', () => {
+			installPrompt = undefined
+			installButton.hidden = true
+		})
 		if (mobile.matches && read('mobile-help-shown') !== 'true') {
 			write('mobile-help-shown', 'true')
 			toggleHelp()
