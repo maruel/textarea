@@ -6,985 +6,975 @@
 <link rel="manifest" href="manifest.json">
 <title>Textarea</title>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
 
-  html {
-    color-scheme: light dark;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+	html {
+		color-scheme: light dark;
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
 
-    background-color: #fff;
-    --elevated: #fff;
-    --link: #0066cc;
-    --text: #161616;
-    --outline: #007aff;
+		background-color: #fff;
+		--elevated: #fff;
+		--link: #0066cc;
+		--text: #161616;
+		--outline: #007aff;
 
-    @media (prefers-color-scheme: dark) {
-      background-color: #000;
-      --elevated: #121212;
-      --link: #58a6ff;
-      --text: #fff;
-    }
-  }
+		@media (prefers-color-scheme: dark) {
+			background-color: #000;
+			--elevated: #121212;
+			--link: #58a6ff;
+			--text: #fff;
+		}
+	}
 
-  body {
-    color: var(--text);
-  }
+	body {
+		color: var(--text);
+	}
 
-  a {
-    color: var(--link);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1px;
-  }
+	a {
+		color: var(--link);
+		text-decoration: underline;
+		text-underline-offset: 4px;
+		text-decoration-thickness: 1px;
+	}
 
-  article {
-    outline: none;
-    padding: 18px max(18px, calc(50vw - 400px));
-    width: 100%;
-    min-height: 100dvh;
-    font: 18px / 1.5 system-ui;
-    tab-size: 4;
-    white-space: pre-wrap;
-    text-wrap-style: stable;
-    overflow-wrap: break-word;
-  }
+	article {
+		outline: none;
+		padding: 18px max(18px, calc(50vw - 400px));
+		width: 100%;
+		min-height: 100dvh;
+		font: 18px / 1.5 system-ui;
+		tab-size: 4;
+		white-space: pre-wrap;
+		text-wrap-style: stable;
+		overflow-wrap: break-word;
+	}
 
-  .md-h1,
-  .md-h2,
-  .md-h3,
-  .md-h4,
-  .md-h5,
-  .md-h6 {
-    font-weight: 700;
-  }
+	.md-h1,
+	.md-h2,
+	.md-h3,
+	.md-h4,
+	.md-h5,
+	.md-h6 {
+		font-weight: 700;
+	}
 
-  .md-h1 {
-    font-size: 2em;
-  }
+	.md-h1 {
+		font-size: 2em;
+	}
 
-  .md-h2 {
-    font-size: 1.5em;
-  }
+	.md-h2 {
+		font-size: 1.5em;
+	}
 
-  .md-h3 {
-    font-size: 1.25em;
-  }
+	.md-h3 {
+		font-size: 1.25em;
+	}
 
-  .md-h4 {
-    font-size: 1.1em;
-  }
+	.md-h4 {
+		font-size: 1.1em;
+	}
 
-  .md-h5 {
-    font-size: 1em;
-  }
+	.md-h5 {
+		font-size: 1em;
+	}
 
-  .md-h6 {
-    font-size: 0.9em;
-  }
+	.md-h6 {
+		font-size: 0.9em;
+	}
 
-  .md-code {
-    font-family: monospace;
-  }
+	.md-code {
+		font-family: monospace;
+	}
 
-  .md-codeblock {
-    font-family: monospace;
-  }
+	.md-codeblock {
+		font-family: monospace;
+	}
 
-  .md-bold {
-    font-weight: bold;
-  }
+	.md-bold {
+		font-weight: bold;
+	}
 
-  .md-strike {
-    text-decoration: line-through;
-  }
+	.md-strike {
+		text-decoration: line-through;
+	}
 
-  .md-italic {
-    font-style: italic;
-  }
+	.md-italic {
+		font-style: italic;
+	}
 
-  .md-url {
-    cursor: pointer;
-  }
+	.md-url {
+		cursor: pointer;
+	}
 
-  #button {
-    -webkit-tap-highlight-color: transparent;
-    background-color: #0569fa;
-    border-radius: 50%;
-    border: none;
-    bottom: 15px;
-    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, .12);
-    color: #fff;
-    cursor: pointer;
-    display: grid;
-    font-weight: 600;
-    width: 46px;
-    height: 46px;
-    outline: none;
-    overflow: hidden;
-    padding: 0;
-    place-items: center;
-    position: fixed;
-    right: 15px;
-    text-decoration: none;
-    touch-action: manipulation;
-    transition: background-color .3s ease-out;
-    user-select: none;
-    z-index: 1;
-  }
+	#button {
+		-webkit-tap-highlight-color: transparent;
+		background-color: #0569fa;
+		border-radius: 50%;
+		border: none;
+		bottom: 15px;
+		box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, .12);
+		color: #fff;
+		cursor: pointer;
+		display: grid;
+		font-weight: 600;
+		width: 46px;
+		height: 46px;
+		outline: none;
+		overflow: hidden;
+		padding: 0;
+		place-items: center;
+		position: fixed;
+		right: 15px;
+		text-decoration: none;
+		touch-action: manipulation;
+		transition: background-color .3s ease-out;
+		user-select: none;
+		z-index: 1;
+	}
 
-  @media (hover) {
-    #button:hover {
-      color: #fff;
-      background-color: #3c86f3;
-      box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-    }
-  }
+	@media (hover) {
+		#button:hover {
+			color: #fff;
+			background-color: #3c86f3;
+			box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+		}
+	}
 
-  #button:focus-visible {
-    outline: 2px solid var(--outline);
-    outline-offset: 2px;
-  }
+	#button:focus-visible {
+		outline: 2px solid var(--outline);
+		outline-offset: 2px;
+	}
 
-  #button[aria-pressed="true"] {
-    background-color: #e8352b;
-  }
+	#button[aria-pressed="true"] {
+		background-color: #e8352b;
+	}
 
-  @media (hover) {
-    #button[aria-pressed="true"]:hover {
-      background-color: #f05a51;
-    }
-  }
+	@media (hover) {
+		#button[aria-pressed="true"]:hover {
+			background-color: #f05a51;
+		}
+	}
 
-  span.ripple {
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    animation: ripple 600ms linear;
-    background-color: rgba(255, 255, 255, 0.7);
-  }
+	span.ripple {
+		position: absolute;
+		border-radius: 50%;
+		transform: scale(0);
+		animation: ripple 600ms linear;
+		background-color: rgba(255, 255, 255, 0.7);
+	}
 
-  @keyframes ripple {
-    to {
-      transform: scale(4);
-      opacity: 0;
-    }
-  }
+	@keyframes ripple {
+		to {
+			transform: scale(4);
+			opacity: 0;
+		}
+	}
 
-  #help {
-    /* The `*` reset above zeroes the margin the UA uses to center a modal dialog. */
-    margin: auto;
-    outline: none;
-    width: min(440px, 100vw - 32px);
-    max-height: calc(100dvh - 32px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 20px 24px;
-    border: none;
-    border-radius: 12px;
-    background: var(--elevated);
-    color: var(--text);
-    font: 16px / 1.5 system-ui;
-    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.10), 0 15px 12px rgba(0, 0, 0, 0.05);
-  }
+	#help {
+		/* The `*` reset above zeroes the margin the UA uses to center a modal dialog. */
+		margin: auto;
+		outline: none;
+		width: min(440px, 100vw - 32px);
+		max-height: calc(100dvh - 32px);
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 20px 24px;
+		border: none;
+		border-radius: 12px;
+		background: var(--elevated);
+		color: var(--text);
+		font: 16px / 1.5 system-ui;
+		box-shadow: 0 19px 38px rgba(0, 0, 0, 0.10), 0 15px 12px rgba(0, 0, 0, 0.05);
+	}
 
-  #help::backdrop {
-    background: rgba(0, 0, 0, 0.35);
-  }
+	#help::backdrop {
+		background: rgba(0, 0, 0, 0.35);
+	}
 
-  #help h1 {
-    font-size: 1.25em;
-  }
+	#help h1 {
+		font-size: 1.25em;
+	}
 
-  #help h2 {
-    font-size: 1em;
-    margin-top: 14px;
-  }
+	#help h2 {
+		font-size: 1em;
+		margin-top: 14px;
+	}
 
-  #help ul {
-    padding-left: 20px;
-  }
+	#help ul {
+		padding-left: 20px;
+	}
 
-  #help code,
-  #help kbd {
-    font-family: monospace;
-  }
+	#help code,
+	#help kbd {
+		font-family: monospace;
+	}
 
-  #help select {
-    font: inherit;
-    color: inherit;
-    background: transparent;
-    margin-left: 8px;
-    padding: 2px 4px;
-    border: 1px solid rgba(128, 128, 128, 0.5);
-    border-radius: 6px;
-  }
+	#help .lang {
+		font: inherit;
+		color: inherit;
+		background: transparent;
+		cursor: pointer;
+		margin-left: 8px;
+		padding: 2px 10px;
+		border: 1px solid rgba(128, 128, 128, 0.5);
+		border-radius: 6px;
+	}
 
-  #help kbd {
-    border: 1px solid rgba(128, 128, 128, 0.5);
-    border-radius: 4px;
-    padding: 0 4px;
-  }
+	#help .lang[aria-pressed="true"] {
+		background-color: #0569fa;
+		border-color: #0569fa;
+		color: #fff;
+	}
 
-  #notification {
-    visibility: hidden;
-    transform: translateY(-30px);
-    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    opacity: 0;
+	#help kbd {
+		border: 1px solid rgba(128, 128, 128, 0.5);
+		border-radius: 4px;
+		padding: 0 4px;
+	}
 
-    display: flex;
-    flex-direction: column;
+	#notification {
+		visibility: hidden;
+		transform: translateY(-30px);
+		transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+		opacity: 0;
 
-    position: fixed;
-    right: 17px;
-    top: 17px;
+		display: flex;
+		flex-direction: column;
 
-    background: #5ad227;
-    color: #fff;
-    border-radius: 30px;
-    font: 18px / 1 system-ui;
-    font-weight: 600;
-    z-index: 2;
-    padding: 10px 20px;
-  }
+		position: fixed;
+		right: 17px;
+		top: 17px;
 
-  #notification.visible {
-    opacity: 1;
-    transform: translateY(0);
-    visibility: visible;
-  }
+		background: #5ad227;
+		color: #fff;
+		border-radius: 30px;
+		font: 18px / 1 system-ui;
+		font-weight: 600;
+		z-index: 2;
+		padding: 10px 20px;
+	}
 
-  @media print {
-    .noprint {
-      visibility: hidden !important;
-    }
-  }
+	#notification.visible {
+		opacity: 1;
+		transform: translateY(0);
+		visibility: visible;
+	}
+
+	@media print {
+		.noprint {
+			visibility: hidden !important;
+		}
+	}
 </style>
 <article contenteditable="plaintext-only" spellcheck autofocus></article>
 <button id="button" class="noprint" type="button" aria-pressed="false" aria-label="Dictate" title="Dictate">
-  <svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor"
-       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 2a3 3 0 0 0 -3 3v7a3 3 0 0 0 6 0v-7a3 3 0 0 0 -3 -3"/>
-    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
-    <path d="M8 21h8"/>
-    <path d="M12 19v2"/>
-  </svg>
+	<svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+		stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 2a3 3 0 0 0 -3 3v7a3 3 0 0 0 6 0v-7a3 3 0 0 0 -3 -3" />
+		<path d="M5 10v2a7 7 0 0 0 14 0v-2" />
+		<path d="M8 21h8" />
+		<path d="M12 19v2" />
+	</svg>
 </button>
 <dialog id="help" class="noprint" tabindex="-1">
-  <h1>Textarea</h1>
-  <p>A minimalist text editor that lives entirely in your browser and stores everything in the URL hash.</p>
-  <h2>Features</h2>
-  <ul>
-    <li>🗜️ <b>Compression</b> – your text is compressed with deflate</li>
-    <li>🔗 <b>URL hash</b> – share your notes by copying the URL</li>
-    <li>💕 <b>Style</b> – customize the look with CSS via DevTools</li>
-    <li class="dictation">🎤 <b>Dictation</b> – speech recognition types at the caret</li>
-  </ul>
-  <h2>Keys</h2>
-  <ul>
-    <li><kbd>F1</kbd> – this help</li>
-    <li class="dictation"><kbd>F2</kbd> – start and stop dictation</li>
-    <li class="dictation"><kbd>F3</kbd> – dictate in English (US)</li>
-    <li class="dictation"><kbd>F4</kbd> – dictate in <span id="lang-browser">your browser language</span></li>
-    <li><kbd class="mod">Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
-    <li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> – save as text</li>
-  </ul>
-  <h2 class="dictation">Dictation</h2>
-  <p class="dictation">
-    <label for="lang">Language</label>
-    <select id="lang">
-      <option value="en-US">English (US)</option>
-      <option value="en-CA">English (Canada)</option>
-      <option value="en-GB">English (UK)</option>
-      <option value="fr-CA">Français (Canada)</option>
-      <option value="fr-FR">Français (France)</option>
-      <option value="es-ES">Español</option>
-      <option value="de-DE">Deutsch</option>
-      <option value="it-IT">Italiano</option>
-      <option value="pt-BR">Português (Brasil)</option>
-      <option value="nl-NL">Nederlands</option>
-      <option value="ja-JP">日本語</option>
-      <option value="ko-KR">한국어</option>
-      <option value="zh-CN">中文</option>
-    </select>
-  </p>
-  <h2>Pro tips</h2>
-  <ul>
-    <li>Start the document with <code># Title</code> to set the page title</li>
-    <li>Add a <code>style</code> attribute to the <code>&lt;article&gt;</code> tag via DevTools. It is saved in the
-      URL too
-    </li>
-  </ul>
-  <p><a href="https://github.com/maruel/textarea" target="_blank" rel="noopener noreferrer">github.com/maruel/textarea</a>
-  </p>
+	<h1>Textarea</h1>
+	<p>A minimalist text editor that lives entirely in your browser and stores everything in the URL hash.</p>
+	<h2>Features</h2>
+	<ul>
+		<li>🗜️ <b>Compression</b> – your text is compressed with deflate</li>
+		<li>🔗 <b>URL hash</b> – share your notes by copying the URL</li>
+		<li>💕 <b>Style</b> – customize the look with CSS via DevTools</li>
+		<li class="dictation">🎤 <b>Dictation</b> – speech recognition types at the caret</li>
+	</ul>
+	<h2>Keys</h2>
+	<ul>
+		<li><kbd>F1</kbd> – this help</li>
+		<li class="dictation"><kbd>F2</kbd> – start and stop dictation</li>
+		<li><kbd class="mod">Ctrl</kbd>+<kbd>S</kbd> – save as HTML</li>
+		<li><kbd class="mod">Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> – save as text</li>
+	</ul>
+	<h2 class="dictation">Dictation</h2>
+	<p class="dictation">
+		Language
+		<button class="lang" type="button" value="en-US">en-US</button>
+		<button class="lang" type="button" id="lang-browser"></button>
+	</p>
+	<h2>Pro tips</h2>
+	<ul>
+		<li>Start the document with <code># Title</code> to set the page title</li>
+		<li>Add a <code>style</code> attribute to the <code>&lt;article&gt;</code> tag via DevTools. It is saved in the
+			URL too
+		</li>
+	</ul>
+	<p><a href="https://github.com/maruel/textarea" target="_blank"
+			rel="noopener noreferrer">github.com/maruel/textarea</a>
+	</p>
 </dialog>
 <div id="notification" class="noprint"></div>
 <script>
-  const article = document.querySelector('article')
-  const editor = new Editor(article, parseMarkdown)
-  initUI()
-  article.addEventListener('input', debounce(500, save))
-  article.addEventListener('blur', save)
-  article.addEventListener('click', event => {
-    if (event.target.tagName === 'A') window.open(event.target.getAttribute('href'), '_blank')
-  })
-  addEventListener('DOMContentLoaded', load)
-  addEventListener('hashchange', load)
-  addEventListener('load', () => new MutationObserver(save).observe(article, {attributeFilter: ['style']}))
-  addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
-      e.preventDefault()
-      if (e.shiftKey) downloadTXT(); else downloadHTML()
-    }
-    if (e.code === 'F1') {
-      e.preventDefault()
-      toggleHelp()
-    }
-  })
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-  }
-
-  console.log('%cGitHub https://github.com/antonmedv/textarea', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px; ')
-
-  async function load() {
-    try {
-      if (location.hash !== '') await set(location.hash)
-    } catch (e) {
-      article.textContent = ''
-      article.removeAttribute('style')
-    }
-    updateTitle()
-  }
-
-  async function save() {
-    const hash = await get()
-    if (location.hash !== hash) history.replaceState({}, '', hash)
-    updateTitle()
-  }
-
-  async function set(hash) {
-    if (!hash) return
-    const [content, style] = (await decompress(hash.slice(1))).split('\x00')
-    editor.set(content)
-    if (style) article.setAttribute('style', style)
-  }
-
-  async function get() {
-    const style = article.getAttribute('style')
-    const content = article.textContent + (style !== null ? '\x00' + style : '')
-    return '#' + await compress(content)
-  }
-
-  function updateTitle() {
-    const match = article.textContent.match(/^\n*#(.+)\n/)
-    document.title = match?.[1] ?? 'Textarea'
-  }
-
-  async function compress(string) {
-    const byteArray = new TextEncoder().encode(string)
-    const stream = new CompressionStream('deflate-raw')
-    const writer = stream.writable.getWriter()
-    writer.write(byteArray)
-    writer.close()
-    const buffer = await new Response(stream.readable).arrayBuffer()
-    return new Uint8Array(buffer).toBase64({alphabet: 'base64url'})
-  }
-
-  async function decompress(b64) {
-    const byteArray = Uint8Array.fromBase64(b64, {alphabet: 'base64url'})
-    const stream = new DecompressionStream('deflate-raw')
-    const writer = stream.writable.getWriter()
-    writer.write(byteArray)
-    writer.close()
-    const buffer = await new Response(stream.readable).arrayBuffer()
-    return new TextDecoder().decode(buffer)
-  }
-
-  // localStorage throws when the browser blocks storage, e.g. in a sandboxed frame.
-  function read(key) {
-    try {
-      return localStorage.getItem(key)
-    } catch {
-      return null
-    }
-  }
-
-  function write(key, value) {
-    try {
-      localStorage.setItem(key, value)
-    } catch {
-    }
-  }
-
-  function debounce(ms, fn) {
-    let timer
-    return (...args) => {
-      clearTimeout(timer)
-      timer = setTimeout(() => fn(...args), ms)
-    }
-  }
-
-  async function downloadHTML() {
-    updateTitle()
-    const doc = document.documentElement.cloneNode(true)
-    doc.querySelectorAll('script').forEach(s => s.remove())
-    doc.querySelectorAll('.noprint').forEach(s => s.remove())
-    doc.querySelector('article').removeAttribute('contenteditable')
-    await download('.html', 'text/html', '<!DOCTYPE html>\n' + doc.outerHTML)
-  }
-
-  async function downloadTXT() {
-    updateTitle()
-    await download('.txt', 'text/plain', article.textContent)
-  }
-
-  async function download(ext, type, content) {
-    const name = document.title + ext
-
-    if ('showSaveFilePicker' in window) {
-      try {
-        const handle = await showSaveFilePicker({
-          suggestedName: name,
-          types: [{
-            description: ext.slice(1).toUpperCase() + ' file',
-            accept: {[type]: [ext]},
-          }],
-        })
-        const writable = await handle.createWritable()
-        await writable.write(content)
-        await writable.close()
-        return
-      } catch (e) {
-        if (e.name === 'AbortError') return
-      }
-    }
-
-    const url = URL.createObjectURL(new Blob([content], {type}))
-    const a = document.createElement('a')
-    a.href = url
-    a.download = name
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  function parseMarkdown(element) {
-    const input = element.textContent
-    const frag = document.createDocumentFragment()
-
-    const matchers = [
-      {name: 'md-codeblock', re: /```[^\n]*\n[\s\S]*?\n```/y},
-      {name: 'md-codeblock', re: /~~~[^\n]*\n[\s\S]*?\n~~~/y},
-      {name: 'md-h1', re: /^#[ \t]+[^\n]*$/my},
-      {name: 'md-h2', re: /^##[ \t]+[^\n]*$/my},
-      {name: 'md-h3', re: /^###[ \t]+[^\n]*$/my},
-      {name: 'md-h4', re: /^####[ \t]+[^\n]*$/my},
-      {name: 'md-h5', re: /^#####[ \t]+[^\n]*$/my},
-      {name: 'md-h6', re: /^######[ \t]+[^\n]*$/my},
-      {name: 'md-code', re: /`[^`\n]*`/y},
-      {name: 'md-bold', re: /\*\*[^*\n]+?\*\*/y},
-      {name: 'md-bold', re: /__[^_\n]+?__/y},
-      {name: 'md-strike', re: /~~[^~\n]+?~~/y},
-      {name: 'md-italic', re: /\*[^*\n]+?\*/y},
-      {name: 'md-italic', re: /_[^_\n]+?_/y},
-      {name: 'md-url', re: /https?:\/\/[^\s<>()\[\]{}"'`]+/y},
-    ]
-
-    const specials = ['`', '~', '*', '#', '_', 'h']
-
-    let i = 0
-    while (i < input.length) {
-      let matched = false
-      for (const m of matchers) {
-        m.re.lastIndex = i
-        const res = m.re.exec(input)
-        if (res && res.index === i) {
-          const raw = res[0]
-          if (m.name === 'md-url') {
-            const a = document.createElement('a')
-            a.className = 'md-url'
-            a.href = raw
-            a.textContent = raw
-            a.target = '_blank'
-            a.rel = 'noopener noreferrer'
-            frag.appendChild(a)
-          } else {
-            const span = document.createElement('span')
-            span.className = m.name
-            span.textContent = raw
-            frag.appendChild(span)
-          }
-          i += raw.length
-          matched = true
-          break
-        }
-      }
-
-      if (matched) continue
-
-      let next = input.length
-      for (const ch of specials) {
-        const idx = input.indexOf(ch, i)
-        if (idx !== -1 && idx < next) next = idx
-      }
-
-      if (next === i) {
-        frag.appendChild(document.createTextNode(input[i]))
-        i++
-        continue
-      }
-
-      frag.appendChild(document.createTextNode(input.slice(i, next)))
-      i = next
-    }
-
-    article.textContent = ''
-    article.appendChild(frag)
-    article.normalize()
-  }
-
-  function toggleHelp() {
-    const help = document.querySelector('#help')
-    if (help.open) {
-      help.close()
-      return
-    }
-    help.showModal()
-    help.focus() // Else the dialog opens with the GitHub link focused and ringed.
-  }
-
-  function initUI() {
-    const button = document.querySelector('#button')
-    const help = document.querySelector('#help')
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-
-    // A click anywhere, on the dialog or on its backdrop, dismisses the help.
-    // Except on the language picker, which needs the clicks.
-    help.addEventListener('click', event => {
-      if (!event.target.closest('select, label')) help.close()
-    })
-
-    const platform = navigator.userAgentData?.platform || navigator.platform || ''
-    if (/mac|iphone|ipad|ipod/i.test(platform)) {
-      help.querySelectorAll('.mod').forEach(el => el.textContent = '⌘')
-    }
-
-    if (!SpeechRecognition) {
-      button.remove()
-      help.querySelectorAll('.dictation').forEach(el => el.remove())
-      return
-    }
-
-    const recognition = new SpeechRecognition()
-    const langSelect = document.querySelector('#lang')
-    let listening = false
-    let restart = false
-
-    // The UI locale is a poor guess: a French Canadian browser is often used to
-    // dictate in English. `?lang=` wins, then the last pick, then the browser.
-    setLang(new URLSearchParams(location.search).get('lang')
-      || read('lang')
-      || navigator.language, false)
-    help.querySelector('#lang-browser').textContent = navigator.language
-    langSelect.addEventListener('change', () => setLang(langSelect.value))
-
-    // Only an explicit pick is remembered, else a detected locale would outlive
-    // a change of browser language.
-    function setLang(lang, remember = true) {
-      if (!langSelect.querySelector(`option[value="${CSS.escape(lang)}"]`)) {
-        langSelect.append(new Option(lang, lang))
-      }
-      langSelect.value = lang
-      recognition.lang = lang
-      if (remember) write('lang', lang)
-      // A running recognition keeps the language it started with.
-      if (listening) {
-        restart = true
-        recognition.stop()
-      }
-    }
-
-    function toggleDictation() {
-      editor.rememberSelection()
-      if (listening) {
-        recognition.stop()
-      } else {
-        recognition.start()
-      }
-    }
-
-    addEventListener('keydown', event => {
-      if (event.code === 'F2') {
-        event.preventDefault()
-        toggleDictation()
-      }
-      if (event.code === 'F3' || event.code === 'F4') {
-        event.preventDefault()
-        setLang(event.code === 'F3' ? 'en-US' : navigator.language)
-        notify('Dictation: ' + langSelect.selectedOptions[0].textContent)
-      }
-    })
-    button.addEventListener('pointerdown', () => editor.rememberSelection())
-    button.addEventListener('click', event => {
-      if (event.clientX || event.targetTouches) ripple(event)
-      toggleDictation()
-    })
-    recognition.addEventListener('start', () => {
-      listening = true
-      button.setAttribute('aria-pressed', 'true')
-      button.setAttribute('aria-label', 'Stop dictating')
-      button.title = 'Stop dictating'
-    })
-    recognition.addEventListener('result', event => {
-      let transcript = ''
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) transcript += event.results[i][0].transcript
-      }
-      if (transcript) editor.insert(transcript)
-    })
-    recognition.addEventListener('error', () => notify('Speech recognition failed'))
-    recognition.addEventListener('end', () => {
-      listening = false
-      button.setAttribute('aria-pressed', 'false')
-      button.setAttribute('aria-label', 'Dictate')
-      button.title = 'Dictate'
-      if (restart) {
-        restart = false
-        recognition.start()
-      }
-    })
-
-    function notify(message) {
-      const notification = document.querySelector('#notification')
-      notification.classList.add('visible')
-      notification.textContent = message
-      setTimeout(() => notification.classList.remove('visible'), 2e3)
-    }
-  }
-
-  function ripple(event) {
-    const button = event.currentTarget
-    const circle = document.createElement('span')
-    const diameter = Math.max(button.clientWidth, button.clientHeight)
-    const radius = diameter / 2
-    circle.style.width = circle.style.height = `${diameter}px`
-    circle.style.left = `${(event.clientX || event.targetTouches[0].pageX) - button.offsetLeft - radius}px`
-    circle.style.top = `${(event.clientY || event.targetTouches[0].pageY) - button.offsetTop - radius}px`
-    circle.classList.add('ripple')
-    const ripple = button.getElementsByClassName('ripple')[0]
-    if (ripple) ripple.remove()
-    button.appendChild(circle)
-  }
-
-  function Editor(element, highlight) {
-    const listeners = []
-    const history = []
-    let rememberedSelection
-    let at = -1, prev
-
-    const debounceHighlight = debounce(30, () => {
-      const pos = save()
-      highlight(element)
-      restore(pos)
-    })
-
-    const shouldRecord = (event) => {
-      return !isUndo(event) && !isRedo(event)
-        && event.key !== 'Meta'
-        && event.key !== 'Control'
-        && event.key !== 'Alt'
-        && !event.key.startsWith('Arrow')
-    }
-
-    let recording = false
-    const debounceRecordHistory = debounce(300, (event) => {
-      if (shouldRecord(event)) {
-        recordHistory()
-        recording = false
-      }
-    })
-
-    const on = (type, fn) => {
-      listeners.push([type, fn])
-      element.addEventListener(type, fn)
-    }
-    on('keydown', event => {
-      if (event.defaultPrevented) return
-      prev = toString()
-      if (isUndo(event)) doUndo(event)
-      if (isRedo(event)) doRedo(event)
-      if (shouldRecord(event) && !recording) {
-        recordHistory()
-        recording = true
-      }
-    })
-    on('keyup', event => {
-      if (event.defaultPrevented) return
-      if (event.isComposing) return
-      if (prev !== toString()) debounceHighlight()
-      debounceRecordHistory(event)
-    })
-    on('paste', () => setTimeout(recordHistory, 10))
-    on('cut', () => setTimeout(recordHistory, 10))
-    on('beforeinput', event => {
-      if (event.inputType === 'historyUndo') doUndo(event)
-      if (event.inputType === 'historyRedo') doRedo(event)
-    })
-
-    function save() {
-      const s = getSelection()
-      const pos = {start: 0, end: 0, dir: undefined}
-      let {anchorNode, anchorOffset, focusNode, focusOffset} = s
-      if (!anchorNode || !focusNode) throw 'error1'
-      if (anchorNode === element && focusNode === element) {
-        pos.start = (anchorOffset > 0 && element.textContent) ? element.textContent.length : 0
-        pos.end = (focusOffset > 0 && element.textContent) ? element.textContent.length : 0
-        pos.dir = (focusOffset >= anchorOffset) ? '->' : '<-'
-        return pos
-      }
-      if (anchorNode.nodeType === Node.ELEMENT_NODE) {
-        const node = document.createTextNode('')
-        anchorNode.insertBefore(node, anchorNode.childNodes[anchorOffset])
-        anchorNode = node
-        anchorOffset = 0
-      }
-      if (focusNode.nodeType === Node.ELEMENT_NODE) {
-        const node = document.createTextNode('')
-        focusNode.insertBefore(node, focusNode.childNodes[focusOffset])
-        focusNode = node
-        focusOffset = 0
-      }
-      visit(element, el => {
-        if (el === anchorNode && el === focusNode) {
-          pos.start += anchorOffset
-          pos.end += focusOffset
-          pos.dir = anchorOffset <= focusOffset ? '->' : '<-'
-          return 'stop'
-        }
-        if (el === anchorNode) {
-          pos.start += anchorOffset
-          if (!pos.dir) {
-            pos.dir = '->'
-          } else {
-            return 'stop'
-          }
-        } else if (el === focusNode) {
-          pos.end += focusOffset
-          if (!pos.dir) {
-            pos.dir = '<-'
-          } else {
-            return 'stop'
-          }
-        }
-        if (el.nodeType === Node.TEXT_NODE) {
-          if (pos.dir !== '->') pos.start += el.nodeValue.length
-          if (pos.dir !== '<-') pos.end += el.nodeValue.length
-        }
-      })
-
-      element.normalize()
-      return pos
-    }
-
-    function restore(pos) {
-      const s = getSelection()
-      let startNode, startOffset = 0
-      let endNode, endOffset = 0
-
-      if (!pos.dir) pos.dir = '->'
-      if (pos.start < 0) pos.start = 0
-      if (pos.end < 0) pos.end = 0
-
-      if (pos.dir === '<-') {
-        const {start, end} = pos
-        pos.start = end
-        pos.end = start
-      }
-
-      let current = 0
-
-      visit(element, el => {
-        if (el.nodeType !== Node.TEXT_NODE) return
-
-        const len = (el.nodeValue || '').length
-        if (current + len > pos.start) {
-          if (!startNode) {
-            startNode = el
-            startOffset = pos.start - current
-          }
-          if (current + len > pos.end) {
-            endNode = el
-            endOffset = pos.end - current
-            return 'stop'
-          }
-        }
-        current += len
-      })
-
-      if (!startNode) {
-        startNode = element
-        startOffset = element.childNodes.length
-      }
-      if (!endNode) {
-        endNode = element
-        endOffset = element.childNodes.length
-      }
-
-      if (pos.dir === '<-') {
-        [startNode, startOffset, endNode, endOffset] = [endNode, endOffset, startNode, startOffset]
-      }
-
-      {
-        const startEl = uneditable(startNode)
-        if (startEl) {
-          const node = document.createTextNode('')
-          startEl.parentNode?.insertBefore(node, startEl)
-          startNode = node
-          startOffset = 0
-        }
-        const endEl = uneditable(endNode)
-        if (endEl) {
-          const node = document.createTextNode('')
-          endEl.parentNode?.insertBefore(node, endEl)
-          endNode = node
-          endOffset = 0
-        }
-      }
-
-      s.setBaseAndExtent(startNode, startOffset, endNode, endOffset)
-      element.normalize()
-    }
-
-    function uneditable(node) {
-      while (node && node !== element) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          if (node.getAttribute('contenteditable') === 'false') {
-            return node
-          }
-        }
-        node = node.parentNode
-      }
-    }
-
-    function doUndo(event) {
-      preventDefault(event)
-      at--
-      const record = history[at]
-      if (record) {
-        element.innerHTML = record.html
-        restore(record.pos)
-      }
-      if (at < 0) at = 0
-    }
-
-    function doRedo(event) {
-      preventDefault(event)
-      at++
-      const record = history[at]
-      if (record) {
-        element.innerHTML = record.html
-        restore(record.pos)
-      }
-      if (at >= history.length) at--
-    }
-
-    function recordHistory() {
-      const html = element.innerHTML
-      const pos = save()
-      const lastRecord = history[at]
-      if (
-        lastRecord
-        && lastRecord.html === html
-        && lastRecord.pos.start === pos.start
-        && lastRecord.pos.end === pos.end
-      ) return
-      at++
-      history[at] = {html, pos}
-      history.splice(at + 1)
-      const maxHistory = 10_000
-      if (at > maxHistory) {
-        at = maxHistory
-        history.splice(0, 1)
-      }
-    }
-
-    function visit(editor, visitor) {
-      const queue = []
-      if (editor.firstChild) queue.push(editor.firstChild)
-      let el = queue.pop()
-      while (el) {
-        if (visitor(el) === 'stop') break
-        if (el.nextSibling) queue.push(el.nextSibling)
-        if (el.firstChild) queue.push(el.firstChild)
-        el = queue.pop()
-      }
-    }
-
-    function isCtrl(event) {
-      return event.metaKey || event.ctrlKey
-    }
-
-    function isUndo(event) {
-      return isCtrl(event) && !event.shiftKey && event.code === 'KeyZ'
-    }
-
-    function isRedo(event) {
-      return isCtrl(event) && event.shiftKey && event.code === 'KeyZ'
-    }
-
-    function toString() {
-      return element.textContent || ''
-    }
-
-    function preventDefault(event) {
-      event.preventDefault()
-    }
-
-    function getSelection() {
-      return element.getRootNode().getSelection()
-    }
-
-    return {
-      set(content) {
-        element.textContent = content
-        highlight(element)
-      },
-      rememberSelection() {
-        const selection = getSelection()
-        if (element.contains(selection.anchorNode) && element.contains(selection.focusNode)) {
-          rememberedSelection = save()
-        }
-      },
-      insert(content) {
-        const pos = rememberedSelection || {
-          start: element.textContent.length,
-          end: element.textContent.length,
-          dir: '->',
-        }
-        const start = Math.min(pos.start, pos.end)
-        const end = Math.max(pos.start, pos.end)
-        const text = element.textContent
-
-        element.focus()
-        restore(pos)
-        recordHistory()
-        element.textContent = text.slice(0, start) + content + text.slice(end)
-        highlight(element)
-
-        const caret = start + content.length
-        rememberedSelection = {start: caret, end: caret, dir: '->'}
-        restore(rememberedSelection)
-        recordHistory()
-        element.dispatchEvent(new Event('input', {bubbles: true}))
-      },
-      destroy() {
-        for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
-      },
-    }
-  }
+	const article = document.querySelector('article')
+	const editor = new Editor(article, parseMarkdown)
+	initUI()
+	article.addEventListener('input', debounce(500, save))
+	article.addEventListener('blur', save)
+	article.addEventListener('click', event => {
+		if (event.target.tagName === 'A') window.open(event.target.getAttribute('href'), '_blank')
+	})
+	addEventListener('DOMContentLoaded', load)
+	addEventListener('hashchange', load)
+	addEventListener('load', () => new MutationObserver(save).observe(article, {attributeFilter: ['style']}))
+	addEventListener('keydown', e => {
+		if ((e.metaKey || e.ctrlKey) && e.code === 'KeyS') {
+			e.preventDefault()
+			if (e.shiftKey) downloadTXT(); else downloadHTML()
+		}
+		if (e.code === 'F1') {
+			e.preventDefault()
+			toggleHelp()
+		}
+	})
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('sw.js')
+	}
+
+	console.log('%cGitHub https://github.com/antonmedv/textarea', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px; ')
+
+	async function load() {
+		try {
+			if (location.hash !== '') await set(location.hash)
+		} catch (e) {
+			article.textContent = ''
+			article.removeAttribute('style')
+		}
+		updateTitle()
+	}
+
+	async function save() {
+		const hash = await get()
+		if (location.hash !== hash) history.replaceState({}, '', hash)
+		updateTitle()
+	}
+
+	async function set(hash) {
+		if (!hash) return
+		const [content, style] = (await decompress(hash.slice(1))).split('\x00')
+		editor.set(content)
+		if (style) article.setAttribute('style', style)
+	}
+
+	async function get() {
+		const style = article.getAttribute('style')
+		const content = article.textContent + (style !== null ? '\x00' + style : '')
+		return '#' + await compress(content)
+	}
+
+	function updateTitle() {
+		const match = article.textContent.match(/^\n*#(.+)\n/)
+		document.title = match?.[1] ?? 'Textarea'
+	}
+
+	async function compress(string) {
+		const byteArray = new TextEncoder().encode(string)
+		const stream = new CompressionStream('deflate-raw')
+		const writer = stream.writable.getWriter()
+		writer.write(byteArray)
+		writer.close()
+		const buffer = await new Response(stream.readable).arrayBuffer()
+		return new Uint8Array(buffer).toBase64({alphabet: 'base64url'})
+	}
+
+	async function decompress(b64) {
+		const byteArray = Uint8Array.fromBase64(b64, {alphabet: 'base64url'})
+		const stream = new DecompressionStream('deflate-raw')
+		const writer = stream.writable.getWriter()
+		writer.write(byteArray)
+		writer.close()
+		const buffer = await new Response(stream.readable).arrayBuffer()
+		return new TextDecoder().decode(buffer)
+	}
+
+	// localStorage throws when the browser blocks storage, e.g. in a sandboxed frame.
+	function read(key) {
+		try {
+			return localStorage.getItem(key)
+		} catch {
+			return null
+		}
+	}
+
+	function write(key, value) {
+		try {
+			localStorage.setItem(key, value)
+		} catch {
+		}
+	}
+
+	function debounce(ms, fn) {
+		let timer
+		return (...args) => {
+			clearTimeout(timer)
+			timer = setTimeout(() => fn(...args), ms)
+		}
+	}
+
+	async function downloadHTML() {
+		updateTitle()
+		const doc = document.documentElement.cloneNode(true)
+		doc.querySelectorAll('script').forEach(s => s.remove())
+		doc.querySelectorAll('.noprint').forEach(s => s.remove())
+		doc.querySelector('article').removeAttribute('contenteditable')
+		await download('.html', 'text/html', '<!DOCTYPE html>\n' + doc.outerHTML)
+	}
+
+	async function downloadTXT() {
+		updateTitle()
+		await download('.txt', 'text/plain', article.textContent)
+	}
+
+	async function download(ext, type, content) {
+		const name = document.title + ext
+
+		if ('showSaveFilePicker' in window) {
+			try {
+				const handle = await showSaveFilePicker({
+					suggestedName: name,
+					types: [{
+						description: ext.slice(1).toUpperCase() + ' file',
+						accept: {[type]: [ext]},
+					}],
+				})
+				const writable = await handle.createWritable()
+				await writable.write(content)
+				await writable.close()
+				return
+			} catch (e) {
+				if (e.name === 'AbortError') return
+			}
+		}
+
+		const url = URL.createObjectURL(new Blob([content], {type}))
+		const a = document.createElement('a')
+		a.href = url
+		a.download = name
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
+	function parseMarkdown(element) {
+		const input = element.textContent
+		const frag = document.createDocumentFragment()
+
+		const matchers = [
+			{name: 'md-codeblock', re: /```[^\n]*\n[\s\S]*?\n```/y},
+			{name: 'md-codeblock', re: /~~~[^\n]*\n[\s\S]*?\n~~~/y},
+			{name: 'md-h1', re: /^#[ \t]+[^\n]*$/my},
+			{name: 'md-h2', re: /^##[ \t]+[^\n]*$/my},
+			{name: 'md-h3', re: /^###[ \t]+[^\n]*$/my},
+			{name: 'md-h4', re: /^####[ \t]+[^\n]*$/my},
+			{name: 'md-h5', re: /^#####[ \t]+[^\n]*$/my},
+			{name: 'md-h6', re: /^######[ \t]+[^\n]*$/my},
+			{name: 'md-code', re: /`[^`\n]*`/y},
+			{name: 'md-bold', re: /\*\*[^*\n]+?\*\*/y},
+			{name: 'md-bold', re: /__[^_\n]+?__/y},
+			{name: 'md-strike', re: /~~[^~\n]+?~~/y},
+			{name: 'md-italic', re: /\*[^*\n]+?\*/y},
+			{name: 'md-italic', re: /_[^_\n]+?_/y},
+			{name: 'md-url', re: /https?:\/\/[^\s<>()\[\]{}"'`]+/y},
+		]
+
+		const specials = ['`', '~', '*', '#', '_', 'h']
+
+		let i = 0
+		while (i < input.length) {
+			let matched = false
+			for (const m of matchers) {
+				m.re.lastIndex = i
+				const res = m.re.exec(input)
+				if (res && res.index === i) {
+					const raw = res[0]
+					if (m.name === 'md-url') {
+						const a = document.createElement('a')
+						a.className = 'md-url'
+						a.href = raw
+						a.textContent = raw
+						a.target = '_blank'
+						a.rel = 'noopener noreferrer'
+						frag.appendChild(a)
+					} else {
+						const span = document.createElement('span')
+						span.className = m.name
+						span.textContent = raw
+						frag.appendChild(span)
+					}
+					i += raw.length
+					matched = true
+					break
+				}
+			}
+
+			if (matched) continue
+
+			let next = input.length
+			for (const ch of specials) {
+				const idx = input.indexOf(ch, i)
+				if (idx !== -1 && idx < next) next = idx
+			}
+
+			if (next === i) {
+				frag.appendChild(document.createTextNode(input[i]))
+				i++
+				continue
+			}
+
+			frag.appendChild(document.createTextNode(input.slice(i, next)))
+			i = next
+		}
+
+		article.textContent = ''
+		article.appendChild(frag)
+		article.normalize()
+	}
+
+	function toggleHelp() {
+		const help = document.querySelector('#help')
+		if (help.open) {
+			help.close()
+			return
+		}
+		help.showModal()
+		help.focus() // Else the dialog opens with the GitHub link focused and ringed.
+	}
+
+	function initUI() {
+		const button = document.querySelector('#button')
+		const help = document.querySelector('#help')
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+		// A click anywhere, on the dialog or on its backdrop, dismisses the help.
+		// Except on the language buttons, which need the clicks.
+		help.addEventListener('click', event => {
+			if (!event.target.closest('button')) help.close()
+		})
+
+		const platform = navigator.userAgentData?.platform || navigator.platform || ''
+		if (/mac|iphone|ipad|ipod/i.test(platform)) {
+			help.querySelectorAll('.mod').forEach(el => el.textContent = '⌘')
+		}
+
+		if (!SpeechRecognition) {
+			button.remove()
+			help.querySelectorAll('.dictation').forEach(el => el.remove())
+			return
+		}
+
+		const recognition = new SpeechRecognition()
+		const otherButton = help.querySelector('#lang-browser')
+		let listening = false
+		let restart = false
+
+		// The UI locale is the default and provide a way to // dictate in English.
+		// `?lang=` wins, then the last pick, then the browser.
+		const lang = new URLSearchParams(location.search).get('lang')
+			|| read('lang')
+			|| navigator.language
+		// The second choice is whatever is in use that is not English, so a `?lang=`
+		// is reachable too.
+		otherButton.value = otherButton.textContent = lang === 'en-US' ? navigator.language : lang
+		if (otherButton.value === 'en-US') otherButton.remove()
+
+		const langButtons = help.querySelectorAll('.lang')
+		langButtons.forEach(b => b.addEventListener('click', () => setLang(b.value)))
+		setLang(lang, false)
+
+		// Only an explicit pick is remembered, else a detected locale would outlive
+		// a change of browser language.
+		function setLang(lang, remember = true) {
+			recognition.lang = lang
+			langButtons.forEach(b => b.setAttribute('aria-pressed', String(b.value === lang)))
+			if (remember) write('lang', lang)
+			// A running recognition keeps the language it started with.
+			if (listening) {
+				restart = true
+				recognition.stop()
+			}
+		}
+
+		function toggleDictation() {
+			editor.rememberSelection()
+			if (listening) {
+				recognition.stop()
+			} else {
+				recognition.start()
+			}
+		}
+
+		addEventListener('keydown', event => {
+			if (event.code === 'F2') {
+				event.preventDefault()
+				toggleDictation()
+			}
+		})
+		button.addEventListener('pointerdown', () => editor.rememberSelection())
+		button.addEventListener('click', event => {
+			if (event.clientX || event.targetTouches) ripple(event)
+			toggleDictation()
+		})
+		recognition.addEventListener('start', () => {
+			listening = true
+			button.setAttribute('aria-pressed', 'true')
+			button.setAttribute('aria-label', 'Stop dictating')
+			button.title = 'Stop dictating'
+		})
+		recognition.addEventListener('result', event => {
+			let transcript = ''
+			for (let i = event.resultIndex; i < event.results.length; i++) {
+				if (event.results[i].isFinal) transcript += event.results[i][0].transcript
+			}
+			if (transcript) editor.insert(transcript)
+		})
+		recognition.addEventListener('error', () => notify('Speech recognition failed'))
+		recognition.addEventListener('end', () => {
+			listening = false
+			button.setAttribute('aria-pressed', 'false')
+			button.setAttribute('aria-label', 'Dictate')
+			button.title = 'Dictate'
+			if (restart) {
+				restart = false
+				recognition.start()
+			}
+		})
+
+		function notify(message) {
+			const notification = document.querySelector('#notification')
+			notification.classList.add('visible')
+			notification.textContent = message
+			setTimeout(() => notification.classList.remove('visible'), 2e3)
+		}
+	}
+
+	function ripple(event) {
+		const button = event.currentTarget
+		const circle = document.createElement('span')
+		const diameter = Math.max(button.clientWidth, button.clientHeight)
+		const radius = diameter / 2
+		circle.style.width = circle.style.height = `${diameter}px`
+		circle.style.left = `${(event.clientX || event.targetTouches[0].pageX) - button.offsetLeft - radius}px`
+		circle.style.top = `${(event.clientY || event.targetTouches[0].pageY) - button.offsetTop - radius}px`
+		circle.classList.add('ripple')
+		const ripple = button.getElementsByClassName('ripple')[0]
+		if (ripple) ripple.remove()
+		button.appendChild(circle)
+	}
+
+	function Editor(element, highlight) {
+		const listeners = []
+		const history = []
+		let rememberedSelection
+		let at = -1, prev
+
+		const debounceHighlight = debounce(30, () => {
+			const pos = save()
+			highlight(element)
+			restore(pos)
+		})
+
+		const shouldRecord = (event) => {
+			return !isUndo(event) && !isRedo(event)
+				&& event.key !== 'Meta'
+				&& event.key !== 'Control'
+				&& event.key !== 'Alt'
+				&& !event.key.startsWith('Arrow')
+		}
+
+		let recording = false
+		const debounceRecordHistory = debounce(300, (event) => {
+			if (shouldRecord(event)) {
+				recordHistory()
+				recording = false
+			}
+		})
+
+		const on = (type, fn) => {
+			listeners.push([type, fn])
+			element.addEventListener(type, fn)
+		}
+		on('keydown', event => {
+			if (event.defaultPrevented) return
+			prev = toString()
+			if (isUndo(event)) doUndo(event)
+			if (isRedo(event)) doRedo(event)
+			if (shouldRecord(event) && !recording) {
+				recordHistory()
+				recording = true
+			}
+		})
+		on('keyup', event => {
+			if (event.defaultPrevented) return
+			if (event.isComposing) return
+			if (prev !== toString()) debounceHighlight()
+			debounceRecordHistory(event)
+		})
+		on('paste', () => setTimeout(recordHistory, 10))
+		on('cut', () => setTimeout(recordHistory, 10))
+		on('beforeinput', event => {
+			if (event.inputType === 'historyUndo') doUndo(event)
+			if (event.inputType === 'historyRedo') doRedo(event)
+		})
+
+		function save() {
+			const s = getSelection()
+			const pos = {start: 0, end: 0, dir: undefined}
+			let {anchorNode, anchorOffset, focusNode, focusOffset} = s
+			if (!anchorNode || !focusNode) throw 'error1'
+			if (anchorNode === element && focusNode === element) {
+				pos.start = (anchorOffset > 0 && element.textContent) ? element.textContent.length : 0
+				pos.end = (focusOffset > 0 && element.textContent) ? element.textContent.length : 0
+				pos.dir = (focusOffset >= anchorOffset) ? '->' : '<-'
+				return pos
+			}
+			if (anchorNode.nodeType === Node.ELEMENT_NODE) {
+				const node = document.createTextNode('')
+				anchorNode.insertBefore(node, anchorNode.childNodes[anchorOffset])
+				anchorNode = node
+				anchorOffset = 0
+			}
+			if (focusNode.nodeType === Node.ELEMENT_NODE) {
+				const node = document.createTextNode('')
+				focusNode.insertBefore(node, focusNode.childNodes[focusOffset])
+				focusNode = node
+				focusOffset = 0
+			}
+			visit(element, el => {
+				if (el === anchorNode && el === focusNode) {
+					pos.start += anchorOffset
+					pos.end += focusOffset
+					pos.dir = anchorOffset <= focusOffset ? '->' : '<-'
+					return 'stop'
+				}
+				if (el === anchorNode) {
+					pos.start += anchorOffset
+					if (!pos.dir) {
+						pos.dir = '->'
+					} else {
+						return 'stop'
+					}
+				} else if (el === focusNode) {
+					pos.end += focusOffset
+					if (!pos.dir) {
+						pos.dir = '<-'
+					} else {
+						return 'stop'
+					}
+				}
+				if (el.nodeType === Node.TEXT_NODE) {
+					if (pos.dir !== '->') pos.start += el.nodeValue.length
+					if (pos.dir !== '<-') pos.end += el.nodeValue.length
+				}
+			})
+
+			element.normalize()
+			return pos
+		}
+
+		function restore(pos) {
+			const s = getSelection()
+			let startNode, startOffset = 0
+			let endNode, endOffset = 0
+
+			if (!pos.dir) pos.dir = '->'
+			if (pos.start < 0) pos.start = 0
+			if (pos.end < 0) pos.end = 0
+
+			if (pos.dir === '<-') {
+				const {start, end} = pos
+				pos.start = end
+				pos.end = start
+			}
+
+			let current = 0
+
+			visit(element, el => {
+				if (el.nodeType !== Node.TEXT_NODE) return
+
+				const len = (el.nodeValue || '').length
+				if (current + len > pos.start) {
+					if (!startNode) {
+						startNode = el
+						startOffset = pos.start - current
+					}
+					if (current + len > pos.end) {
+						endNode = el
+						endOffset = pos.end - current
+						return 'stop'
+					}
+				}
+				current += len
+			})
+
+			if (!startNode) {
+				startNode = element
+				startOffset = element.childNodes.length
+			}
+			if (!endNode) {
+				endNode = element
+				endOffset = element.childNodes.length
+			}
+
+			if (pos.dir === '<-') {
+				[startNode, startOffset, endNode, endOffset] = [endNode, endOffset, startNode, startOffset]
+			}
+
+			{
+				const startEl = uneditable(startNode)
+				if (startEl) {
+					const node = document.createTextNode('')
+					startEl.parentNode?.insertBefore(node, startEl)
+					startNode = node
+					startOffset = 0
+				}
+				const endEl = uneditable(endNode)
+				if (endEl) {
+					const node = document.createTextNode('')
+					endEl.parentNode?.insertBefore(node, endEl)
+					endNode = node
+					endOffset = 0
+				}
+			}
+
+			s.setBaseAndExtent(startNode, startOffset, endNode, endOffset)
+			element.normalize()
+		}
+
+		function uneditable(node) {
+			while (node && node !== element) {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+					if (node.getAttribute('contenteditable') === 'false') {
+						return node
+					}
+				}
+				node = node.parentNode
+			}
+		}
+
+		function doUndo(event) {
+			preventDefault(event)
+			at--
+			const record = history[at]
+			if (record) {
+				element.innerHTML = record.html
+				restore(record.pos)
+			}
+			if (at < 0) at = 0
+		}
+
+		function doRedo(event) {
+			preventDefault(event)
+			at++
+			const record = history[at]
+			if (record) {
+				element.innerHTML = record.html
+				restore(record.pos)
+			}
+			if (at >= history.length) at--
+		}
+
+		function recordHistory() {
+			const html = element.innerHTML
+			const pos = save()
+			const lastRecord = history[at]
+			if (
+				lastRecord
+				&& lastRecord.html === html
+				&& lastRecord.pos.start === pos.start
+				&& lastRecord.pos.end === pos.end
+			) return
+			at++
+			history[at] = {html, pos}
+			history.splice(at + 1)
+			const maxHistory = 10_000
+			if (at > maxHistory) {
+				at = maxHistory
+				history.splice(0, 1)
+			}
+		}
+
+		function visit(editor, visitor) {
+			const queue = []
+			if (editor.firstChild) queue.push(editor.firstChild)
+			let el = queue.pop()
+			while (el) {
+				if (visitor(el) === 'stop') break
+				if (el.nextSibling) queue.push(el.nextSibling)
+				if (el.firstChild) queue.push(el.firstChild)
+				el = queue.pop()
+			}
+		}
+
+		function isCtrl(event) {
+			return event.metaKey || event.ctrlKey
+		}
+
+		function isUndo(event) {
+			return isCtrl(event) && !event.shiftKey && event.code === 'KeyZ'
+		}
+
+		function isRedo(event) {
+			return isCtrl(event) && event.shiftKey && event.code === 'KeyZ'
+		}
+
+		function toString() {
+			return element.textContent || ''
+		}
+
+		function preventDefault(event) {
+			event.preventDefault()
+		}
+
+		function getSelection() {
+			return element.getRootNode().getSelection()
+		}
+
+		return {
+			set(content) {
+				element.textContent = content
+				highlight(element)
+			},
+			rememberSelection() {
+				const selection = getSelection()
+				if (element.contains(selection.anchorNode) && element.contains(selection.focusNode)) {
+					rememberedSelection = save()
+				}
+			},
+			insert(content) {
+				const pos = rememberedSelection || {
+					start: element.textContent.length,
+					end: element.textContent.length,
+					dir: '->',
+				}
+				const start = Math.min(pos.start, pos.end)
+				const end = Math.max(pos.start, pos.end)
+				const text = element.textContent
+
+				element.focus()
+				restore(pos)
+				recordHistory()
+				element.textContent = text.slice(0, start) + content + text.slice(end)
+				highlight(element)
+
+				const caret = start + content.length
+				rememberedSelection = {start: caret, end: caret, dir: '->'}
+				restore(rememberedSelection)
+				recordHistory()
+				element.dispatchEvent(new Event('input', {bubbles: true}))
+			},
+			destroy() {
+				for (const [type, fn] of listeners) editor.removeEventListener(type, fn)
+			},
+		}
+	}
 </script>
