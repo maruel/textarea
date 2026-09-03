@@ -2,13 +2,17 @@
 
 A _minimalist_ text editor that lives entirely in your browser and stores everything in the URL hash.
 
+This project is based on [antonmedv/textarea](https://github.com/antonmedv/textarea).
+
 See [SETUP.md](SETUP.md) for Cloudflare Pages and self-hosting instructions.
 
 <p align="center">
   <a href="https://textarea.maruel.ca/#VZA9TgMxEIV7n2KkdJZIejoURIGgYaGgnGSHeITXXtmzG0zFAZDSREoTlIZDIHGbXIAcAXsTClrP-_meRyD0IhgIx01S6gJ0w44btBxFDzegmsUHEIMClnuKQE44kE3ADpLvAsyCX0YKgK6GmMVF01NIYtgtikoMwcPdDRiMZqyUEWnj-WTyr3s0gitC6bJbqTM47Dbbn68VaD31TZsfI3unNezf1vBYSge4BUmE-UlANSxZDNT0ZFFoCFlvcsJf9clemVx6JHdeMuws5Yw2FVgsnNm5374fdqvvbK4kWTo5p12e1_ArDYus98_HxmlVQc8Il9Tfe2_zAKVvsabjdf_xWZaU37nGHqt54FZ01vwC">
-    <img src=".github/textarea-my-screenshot.webp" alt="Screenshot of textarea.maruel.ca" width="550" height="386">
+    <img src="rsc/textarea-screenshot.webp" alt="Screenshot of textarea.maruel.ca" width="550" height="393">
   </a>
 </p>
+
+The screenshot is generated from the local app with [`rsc/screenshot.sh`](rsc/screenshot.sh).
 
 ## Features
 

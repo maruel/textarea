@@ -25,7 +25,7 @@ deploys future pushes. No GitHub Action is needed.
 The script securely prompts for the token.
 
 ```sh
-./scripts/setup-cloudflare-pages.py \
+./rsc/setup-cloudflare-pages.py \
   --account-id '<account-id>' \
   --custom-domain textarea.maruel.ca
 ```
@@ -47,7 +47,7 @@ For this repository it infers `main`. If the result is ambiguous, pass an
 explicit value:
 
 ```sh
-./scripts/setup-cloudflare-pages.py \
+./rsc/setup-cloudflare-pages.py \
   --account-id '<account-id>' \
   --production-branch main
 ```
