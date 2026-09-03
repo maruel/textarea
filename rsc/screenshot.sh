@@ -7,8 +7,8 @@ project_dir="$(CDPATH='' cd -- "${script_dir}/.." && pwd)"
 readonly project_dir
 output="${script_dir}/textarea-screenshot.webp"
 readonly output
-readonly screenshot_width=1400
-readonly screenshot_height=920
+readonly screenshot_width=1000
+readonly screenshot_height=650
 readonly titlebar_height=40
 readonly corner_radius=18
 readonly frame_width="${screenshot_width}"

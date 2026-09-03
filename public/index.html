@@ -675,6 +675,7 @@
 		let restart = false
 		let stopping = false
 		let jingleContext
+		let dictationResults = []
 
 		// The UI locale is the default and provide a way to // dictate in English.
 		// `?lang=` wins, then the last pick, then the browser.
@@ -756,23 +757,31 @@
 		})
 		recognition.addEventListener('start', () => {
 			listening = true
+			dictationResults = []
 			editor.startDictation()
 			button.setAttribute('aria-pressed', 'true')
 			button.setAttribute('aria-label', 'Stop dictating')
 			button.title = 'Stop dictating'
 		})
 		recognition.addEventListener('result', event => {
+			for (let i = event.resultIndex; i < event.results.length; i++) {
+				dictationResults[i] = {
+					isFinal: event.results[i].isFinal,
+					transcript: event.results[i][0].transcript,
+				}
+			}
+			dictationResults.length = event.results.length
 			let finalLength = 0
 			let transcript = ''
 			let stop = false
-			for (let i = 0; i < event.results.length; i++) {
-				const result = event.results[i][0].transcript
-				if (event.results[i].isFinal && /^\s*stop[.!?]*\s*$/i.test(result)) {
+			for (const speechResult of dictationResults) {
+				const {isFinal, transcript: result} = speechResult
+				if (isFinal && /^\s*stop[.!?]*\s*$/i.test(result)) {
 					stop = true
 					break
 				}
 				transcript += result
-				if (event.results[i].isFinal) finalLength = transcript.length
+				if (isFinal) finalLength = transcript.length
 			}
 			editor.updateDictation(transcript, finalLength)
 			if (stop) stopDictation()
