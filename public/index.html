@@ -372,6 +372,8 @@
 </dialog>
 <div id="notification" class="noprint"></div>
 <script>
+	'use strict'
+
 	const article = document.querySelector('article')
 	const editor = new Editor(article, parseMarkdown)
 	initUI()
@@ -671,6 +673,8 @@
 		const otherButton = help.querySelector('#lang-browser')
 		let listening = false
 		let restart = false
+		let stopping = false
+		let jingleContext
 
 		// The UI locale is the default and provide a way to // dictate in English.
 		// `?lang=` wins, then the last pick, then the browser.
@@ -702,9 +706,40 @@
 		function toggleDictation() {
 			editor.rememberSelection()
 			if (listening) {
-				recognition.stop()
+				stopDictation()
 			} else {
+				prepareStopJingle()
 				recognition.start()
+			}
+		}
+
+		function stopDictation() {
+			stopping = true
+			recognition.stop()
+		}
+
+		function prepareStopJingle() {
+			const AudioContext = window.AudioContext || window.webkitAudioContext
+			if (!AudioContext) return
+			jingleContext ||= new AudioContext()
+			if (jingleContext.state === 'suspended') void jingleContext.resume()
+		}
+
+		function playStopJingle() {
+			const context = jingleContext
+			if (!context || context.state !== 'running') return
+			const start = context.currentTime
+			for (const [frequency, offset] of [[523.25, 0], [659.25, .09], [783.99, .18]]) {
+				const oscillator = context.createOscillator()
+				const gain = context.createGain()
+				oscillator.type = 'sine'
+				oscillator.frequency.value = frequency
+				gain.gain.setValueAtTime(.0001, start + offset)
+				gain.gain.exponentialRampToValueAtTime(.06, start + offset + .01)
+				gain.gain.exponentialRampToValueAtTime(.0001, start + offset + .1)
+				oscillator.connect(gain).connect(context.destination)
+				oscillator.start(start + offset)
+				oscillator.stop(start + offset + .1)
 			}
 		}
 
@@ -740,15 +775,18 @@
 				if (event.results[i].isFinal) finalLength = transcript.length
 			}
 			editor.updateDictation(transcript, finalLength)
-			if (stop) recognition.stop()
+			if (stop) stopDictation()
 		})
 		recognition.addEventListener('error', () => notify('Speech recognition failed'))
 		recognition.addEventListener('end', () => {
+			const stopped = stopping
+			stopping = false
 			listening = false
 			editor.endDictation()
 			button.setAttribute('aria-pressed', 'false')
 			button.setAttribute('aria-label', 'Dictate')
 			button.title = 'Dictate'
+			if (stopped) playStopJingle()
 			if (restart) {
 				restart = false
 				recognition.start()
@@ -1041,6 +1079,37 @@
 			dictationHighlight.add(range)
 		}
 
+		function sameSelection(a, b) {
+			return a.start === b.start && a.end === b.end
+		}
+
+		function moveDictationToSelection() {
+			const selection = getSelection()
+			if (!element.contains(selection.anchorNode) || !element.contains(selection.focusNode)) return
+			const pos = save()
+			if (sameSelection(pos, dictation.selection)) return
+
+			const {start, end, content, finalLength, sourceOffset} = dictation
+			const finalContent = content.slice(0, Math.max(0, finalLength - sourceOffset))
+			const text = element.textContent
+			element.textContent = text.slice(0, start) + finalContent + text.slice(end)
+			highlight(element)
+
+			const rebase = offset => {
+				if (offset <= start) return offset
+				if (offset >= end) return offset + finalContent.length - (end - start)
+				return start + Math.min(offset - start, finalContent.length)
+			}
+			dictation = {
+				start: Math.min(rebase(pos.start), rebase(pos.end)),
+				end: Math.max(rebase(pos.start), rebase(pos.end)),
+				content: '',
+				finalLength,
+				sourceOffset: finalLength,
+				selection: {start: rebase(pos.start), end: rebase(pos.end)},
+			}
+		}
+
 		function visit(editor, visitor) {
 			const queue = []
 			if (editor.firstChild) queue.push(editor.firstChild)
@@ -1101,20 +1170,32 @@
 				restore(pos)
 				recordHistory()
 				dictationHighlight?.clear()
-				dictation = {start, end}
+				dictation = {
+					start,
+					end,
+					content: '',
+					finalLength: 0,
+					sourceOffset: 0,
+					selection: {start, end},
+				}
 			},
 			updateDictation(content, finalLength) {
 				if (!dictation) return
-				const {start, end} = dictation
+				moveDictationToSelection()
+				const {start, end, sourceOffset} = dictation
+				const currentContent = content.slice(sourceOffset)
 				const text = element.textContent
-				element.textContent = text.slice(0, start) + content + text.slice(end)
-				dictation.end = start + content.length
+				element.textContent = text.slice(0, start) + currentContent + text.slice(end)
+				dictation.content = currentContent
+				dictation.end = start + currentContent.length
+				dictation.finalLength = finalLength
 				highlight(element)
 
-				const caret = start + content.length
+				const caret = start + currentContent.length
 				rememberedSelection = {start: caret, end: caret, dir: '->'}
 				restore(rememberedSelection)
-				showDictationInterim(start + finalLength, caret)
+				dictation.selection = {start: caret, end: caret}
+				showDictationInterim(start + Math.max(0, finalLength - sourceOffset), caret)
 				element.dispatchEvent(new Event('input', {bubbles: true}))
 			},
 			endDictation() {
