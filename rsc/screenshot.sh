@@ -10,12 +10,9 @@ readonly output
 readonly screenshot_width=1400
 readonly screenshot_height=920
 readonly titlebar_height=40
-readonly outer_padding=72
 readonly corner_radius=18
 readonly frame_width="${screenshot_width}"
 readonly frame_height=$((screenshot_height + titlebar_height))
-readonly canvas_width=$((frame_width + outer_padding * 2))
-readonly canvas_height=$((frame_height + outer_padding * 2))
 sample=$'# Plain text, clear thoughts\n\nA quiet space for notes, ideas, and words that matter.\n\n## Keep it simple\n\n- Write without distractions\n- Share with a link\n- Dictate at the caret\n'
 readonly sample
 
@@ -75,9 +72,8 @@ magick "${frame}" \
 	\( +clone -background '#1f2937' -shadow 40x14+0+16 \) \
 	+swap -background none -layers merge +repage \
 	"${shadow}"
-magick \
-	-size "${canvas_width}x${canvas_height}" radial-gradient:'#ffffff-#e9ecff' \
-	"${shadow}" -gravity center -composite \
+magick "${shadow}" \
+	-trim +repage \
 	-strip -quality 88 \
 	"${webp}"
 mv -- "${webp}" "${output}"
