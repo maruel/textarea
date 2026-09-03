@@ -666,6 +666,7 @@
 		}
 
 		const recognition = new SpeechRecognition()
+		recognition.continuous = true
 		recognition.interimResults = true
 		const otherButton = help.querySelector('#lang-browser')
 		let listening = false
