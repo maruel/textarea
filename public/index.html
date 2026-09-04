@@ -439,31 +439,42 @@
 	}
 
 	function initServiceWorker() {
-		let prompting = false
-		let refreshing = false
-		const promptToRefresh = worker => {
-			if (prompting) return
-			prompting = true
-			if (!confirm('An update is ready. Refresh now?')) return
-			refreshing = true
-			worker.postMessage('skipWaiting')
+		let controller = navigator.serviceWorker.controller
+		let dictating = false
+		let updateReady = false
+		let reloading = false
+		const refresh = async () => {
+			if (reloading) return
+			reloading = true
+			try {
+				await save()
+				location.reload()
+			} catch (error) {
+				reloading = false
+				console.error('Could not save before applying update:', error)
+			}
 		}
-
-		navigator.serviceWorker.addEventListener('controllerchange', () => {
-			if (refreshing) location.reload()
+		const refreshWhenReady = () => {
+			if (dictating) {
+				updateReady = true
+				return
+			}
+			refresh()
+		}
+		addEventListener('dictationstart', () => {
+			dictating = true
 		})
-		navigator.serviceWorker.register('sw.js').then(registration => {
-			if (registration.waiting) promptToRefresh(registration.waiting)
-			registration.addEventListener('updatefound', () => {
-				const worker = registration.installing
-				if (!worker) return
-				worker.addEventListener('statechange', () => {
-					if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-						promptToRefresh(worker)
-					}
-				})
-			})
-		}).catch(error => console.error('Service worker registration failed:', error))
+		addEventListener('dictationend', () => {
+			dictating = false
+			if (updateReady) refresh()
+		})
+		navigator.serviceWorker.addEventListener('controllerchange', () => {
+			const updating = Boolean(controller)
+			controller = navigator.serviceWorker.controller
+			if (updating) refreshWhenReady()
+		})
+		navigator.serviceWorker.register('sw.js')
+			.catch(error => console.error('Service worker registration failed:', error))
 	}
 
 	async function compress(string) {
@@ -791,6 +802,7 @@
 			listening = true
 			dictationResults = []
 			editor.startDictation()
+			dispatchEvent(new Event('dictationstart'))
 			button.setAttribute('aria-pressed', 'true')
 			button.setAttribute('aria-label', 'Stop dictating')
 			button.title = 'Stop dictating'
@@ -831,7 +843,9 @@
 			if (restart) {
 				restart = false
 				recognition.start()
+				return
 			}
+			dispatchEvent(new Event('dictationend'))
 		})
 
 		function notify(message) {
