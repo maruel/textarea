@@ -173,7 +173,10 @@
 
 	@media (max-width: 600px) {
 		#help-button {
+			bottom: calc(15px + var(--keyboard-offset, 0px));
 			display: grid;
+			right: 69px;
+			top: auto;
 		}
 	}
 
@@ -396,7 +399,7 @@
 		}
 	})
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('sw.js')
+		initServiceWorker()
 	}
 
 	console.log('%cGitHub https://github.com/antonmedv/textarea', 'font-size: 16px; border: 1px solid lightblue; border-radius: 12px; padding: 10px 14px; ')
@@ -433,6 +436,34 @@
 	function updateTitle() {
 		const match = article.textContent.match(/^\n*#(.+)\n/)
 		document.title = match?.[1] ?? 'Textarea'
+	}
+
+	function initServiceWorker() {
+		let prompting = false
+		let refreshing = false
+		const promptToRefresh = worker => {
+			if (prompting) return
+			prompting = true
+			if (!confirm('An update is ready. Refresh now?')) return
+			refreshing = true
+			worker.postMessage('skipWaiting')
+		}
+
+		navigator.serviceWorker.addEventListener('controllerchange', () => {
+			if (refreshing) location.reload()
+		})
+		navigator.serviceWorker.register('sw.js').then(registration => {
+			if (registration.waiting) promptToRefresh(registration.waiting)
+			registration.addEventListener('updatefound', () => {
+				const worker = registration.installing
+				if (!worker) return
+				worker.addEventListener('statechange', () => {
+					if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+						promptToRefresh(worker)
+					}
+				})
+			})
+		}).catch(error => console.error('Service worker registration failed:', error))
 	}
 
 	async function compress(string) {
@@ -661,6 +692,7 @@
 			const moveButton = () => {
 				const offset = Math.max(0, innerHeight - viewport.height - viewport.offsetTop)
 				button.style.setProperty('--keyboard-offset', `${offset}px`)
+				helpButton.style.setProperty('--keyboard-offset', `${offset}px`)
 			}
 			viewport.addEventListener('resize', moveButton)
 			viewport.addEventListener('scroll', moveButton)

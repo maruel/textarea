@@ -9,6 +9,6 @@ Change `CACHE_NAME` in the same commit as **every** change to a file under `publ
 date, `textarea-YYYY-MM-DD`. If the name already carries today's date, append a counter:
 `textarea-2026-09-02-2`.
 
-`public/sw.js` answers a navigation from the network and refreshes the cached page, so a change to
-`index.html` reaches the visitor on their next load, bump or not. The bump is what evicts the rest:
-anything listed in `ASSETS` is served from the cache first and stays stale until the name changes.
+`public/sw.js` answers navigations from the cache first. A newly installed worker waits while the
+page prompts the visitor to refresh; accepting activates the new worker and reloads the page. The
+cache bump evicts stale assets when that update activates.
