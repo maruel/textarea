@@ -824,6 +824,7 @@
 					stop = true
 					break
 				}
+				if (transcript && result && !/\s$/.test(transcript) && !/^\s/.test(result)) transcript += ' '
 				transcript += result
 				if (isFinal) finalLength = transcript.length
 			}

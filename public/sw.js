@@ -1,6 +1,6 @@
 // Bump on every change to a cached asset, else visitors keep the old version.
 // See AGENTS.md.
-const CACHE_NAME = 'textarea-2026-09-04-4'
+const CACHE_NAME = 'textarea-2026-09-05'
 const ASSETS = [
   '/',
 ]
