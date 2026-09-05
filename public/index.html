@@ -372,6 +372,7 @@
 	<p><a href="https://github.com/maruel/textarea" target="_blank"
 			rel="noopener noreferrer">github.com/maruel/textarea</a>
 	</p>
+	<p>Cache: <code id="cache-version">unavailable</code></p>
 </dialog>
 <div id="notification" class="noprint"></div>
 <script>
@@ -439,6 +440,7 @@
 	}
 
 	function initServiceWorker() {
+		const cacheVersion = document.querySelector('#cache-version')
 		let controller = navigator.serviceWorker.controller
 		let dictating = false
 		let updateReady = false
@@ -473,6 +475,15 @@
 			controller = navigator.serviceWorker.controller
 			if (updating) refreshWhenReady()
 		})
+		navigator.serviceWorker.ready.then(registration => {
+			const worker = navigator.serviceWorker.controller || registration.active
+			const channel = new MessageChannel()
+			channel.port1.addEventListener('message', event => {
+				cacheVersion.textContent = event.data
+			}, {once: true})
+			channel.port1.start()
+			worker.postMessage('cache-name', [channel.port2])
+		}).catch(error => console.error('Could not read cache name:', error))
 		navigator.serviceWorker.register('sw.js')
 			.catch(error => console.error('Service worker registration failed:', error))
 	}

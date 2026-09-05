@@ -1,6 +1,6 @@
 // Bump on every change to a cached asset, else visitors keep the old version.
 // See AGENTS.md.
-const CACHE_NAME = 'textarea-2026-09-05'
+const CACHE_NAME = 'textarea-2026-09-05-2'
 const ASSETS = [
   '/',
 ]
@@ -25,6 +25,10 @@ self.addEventListener('activate', (event) => {
       )
     }).then(() => self.clients.claim())
   )
+})
+
+self.addEventListener('message', (event) => {
+  if (event.data === 'cache-name') event.ports[0]?.postMessage(CACHE_NAME)
 })
 
 // The app stays usable offline by serving the cached page first. A newer
